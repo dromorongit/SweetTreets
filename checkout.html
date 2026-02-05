@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Checkout - Sweet Treets">
+  <meta name="keywords" content="checkout, Sweet Treets">
+  <title>Checkout - Sweet Treets</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/images/Sweettreetsicon.PNG" type="image/png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-main">
+        <!-- Logo -->
+        <a href="index.html" class="logo">
+          <img src="assets/images/Sweettreetslogo.PNG" alt="Sweet Treets Logo">
+          <span class="logo-text">Sweet Treets</span>
+        </a>
+        
+        <!-- Navigation Menu -->
+        <nav class="nav-menu">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+          <a href="cart.html" class="nav-link cart-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span class="cart-count">0</span>
+          </a>
+        </nav>
+        
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Checkout</h1>
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <a href="cart.html">Cart</a>
+        <span>/</span>
+        <span>Checkout</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Section -->
+  <section class="checkout-page">
+    <div class="container">
+      <div class="checkout-container">
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+          <form id="checkout-form">
+            <!-- Customer Information -->
+            <div class="form-section">
+              <h3>Customer Information</h3>
+              
+              <div class="form-group">
+                <label for="fullName" class="form-label">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Enter your full name" required>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email" class="form-label">Email Address *</label>
+                  <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                  <label for="phone" class="form-label">Phone Number *</label>
+                  <input type="tel" id="phone" name="phone" class="form-input" placeholder="Enter your phone number" required>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Information -->
+            <div class="form-section">
+              <h3>Delivery Information</h3>
+              
+              <div class="form-group">
+                <label for="address" class="form-label">Delivery Address *</label>
+                <input type="text" id="address" name="address" class="form-input" placeholder="Enter your delivery address" required>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city" class="form-label">City *</label>
+                  <input type="text" id="city" name="city" class="form-input" placeholder="Enter your city" required>
+                </div>
+                <div class="form-group">
+                  <label for="region" class="form-label">Region *</label>
+                  <select id="region" name="region" class="form-input" required>
+                    <option value="">Select Region</option>
+                    <option value="greater-accra">Greater Accra</option>
+                    <option value="ashanti">Ashanti</option>
+                    <option value="central">Central</option>
+                    <option value="eastern">Eastern</option>
+                    <option value="western">Western</option>
+                    <option value="volta">Volta</option>
+                    <option value="northern">Northern</option>
+                    <option value="upper-east">Upper East</option>
+                    <option value="upper-west">Upper West</option>
+                    <option value="bono">Bono</option>
+                    <option value="ahafo">Ahafo</option>
+                    <option value="bono-east">Bono East</option>
+                    <option value="oti">Oti</option>
+                    <option value="western-north">Western North</option>
+                    <option value="savannah">Savannah</option>
+                    <option value="north-east">North East</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="landmark" class="form-label">Landmark (Optional)</label>
+                <input type="text" id="landmark" name="landmark" class="form-input" placeholder="Enter a landmark near your address">
+              </div>
+              
+              <div class="form-group">
+                <label for="deliveryNotes" class="form-label">Delivery Notes (Optional)</label>
+                <textarea id="deliveryNotes" name="deliveryNotes" class="form-input" placeholder="Any special instructions for delivery..." rows="3"></textarea>
+              </div>
+            </div>
+            
+            <!-- Payment Information -->
+            <div class="form-section">
+              <h3>Payment Method</h3>
+              
+              <div class="form-group">
+                <label class="form-label">Select Payment Method *</label>
+                <div style="display: flex; flex-direction: column; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
+                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
+                    <input type="radio" name="paymentMethod" value="cod" checked style="width: 20px; height: 20px;">
+                    <div>
+                      <strong>Cash on Delivery</strong>
+                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Pay when you receive your order</p>
+                    </div>
+                  </label>
+                  
+                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
+                    <input type="radio" name="paymentMethod" value="momo" style="width: 20px; height: 20px;">
+                    <div>
+                      <strong>Mobile Money</strong>
+                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">MTN, AirtelTigo, or Vodafone</p>
+                    </div>
+                  </label>
+                  
+                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
+                    <input type="radio" name="paymentMethod" value="bank" style="width: 20px; height: 20px;">
+                    <div>
+                      <strong>Bank Transfer</strong>
+                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Direct bank transfer</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Order Notes -->
+            <div class="form-section">
+              <h3>Order Notes (Optional)</h3>
+              <div class="form-group">
+                <label for="orderNotes" class="form-label">Special Instructions</label>
+                <textarea id="orderNotes" name="orderNotes" class="form-input" placeholder="Any special requests for your order..." rows="3"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="cart-summary">
+          <h3>Order Summary</h3>
+          
+          <!-- Cart Items Summary -->
+          <div id="checkout-items">
+            <!-- Items will be loaded dynamically -->
+          </div>
+          
+          <!-- Price Summary -->
+          <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border);">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="checkout-subtotal">₵0.00</span>
+            </div>
+            
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>Calculated after order</span>
+            </div>
+            
+            <div class="summary-row total">
+              <span>Total</span>
+              <span id="checkout-total">₵0.00</span>
+            </div>
+          </div>
+          
+          <!-- Place Order Button -->
+          <button type="submit" form="checkout-form" class="btn btn-primary checkout-btn" style="width: 100%;">
+            Place Order
+          </button>
+          
+          <!-- Security Info -->
+          <div style="margin-top: var(--spacing-lg); text-align: center;">
+            <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-bottom: var(--spacing-sm);">
+              🔒 Secure Checkout
+            </p>
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-light);">
+              Your personal and payment information is encrypted and secure.
+            </p>
+          </div>
+          
+          <!-- Return to Cart -->
+          <div style="margin-top: var(--spacing-lg); text-align: center;">
+            <a href="cart.html" style="color: var(--color-accent); font-size: var(--font-size-sm);">
+              ← Return to Cart
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Badges Section -->
+  <section class="section" style="background-color: var(--color-background);">
+    <div class="container">
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">🛡️</div>
+          <h4>Secure Transactions</h4>
+          <p>100% secure payment processing</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">✅</div>
+          <h4>Quality Guarantee</h4>
+          <p>All products verified for quality</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">📦</div>
+          <h4>Safe Packaging</h4>
+          <p>Products delivered in perfect condition</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">⏰</div>
+          <h4>Timely Delivery</h4>
+          <p>On-time delivery guaranteed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <!-- About Section -->
+        <div class="footer-section">
+          <h4>Sweet Treets</h4>
+          <p>Your premier destination for authentic foreign snacks, drinks, and groceries. Bringing world flavors to your doorstep since 2024.</p>
+          <div class="social-links">
+            <a href="https://wa.me/233540421116" class="social-link" target="_blank" rel="noopener" aria-label="WhatsApp">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </a>
+            <a href="https://www.tiktok.com/@sweet_treets?_r=1&_t=ZS-93cYYy6B9Fv" class="social-link" target="_blank" rel="noopener" aria-label="TikTok">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
+            </a>
+            <a href="https://snapchat.com/t/ZTYdjHV6" class="social-link" target="_blank" rel="noopener" aria-label="Snapchat">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.03 2 11c0 1.89.55 3.63 1.48 5.09l.96-2.23c-.42-.73-.66-1.56-.66-2.46 0-3.53 3.26-6.4 7.22-6.4s7.22 2.87 7.22 6.4c0 .9-.24 1.73-.66 2.46l.96 2.23C21.45 14.63 22 12.89 22 11c0-4.97-4.48-9-10-9zm-4.68 8.1c-.5.83-1.55 1.4-2.66 1.4-.31 0-.61-.05-.9-.13l1.11-2.6c.57.28 1.22.44 1.91.44.94 0 1.8-.36 2.45-.95.63.54 1.44.87 2.33.87.77 0 1.49-.29 2.04-.76l1.21 2.51c-.36.17-.73.3-1.12.39-1.11.24-2.24-.05-3.13-.78-.66-.54-1.03-1.32-1.03-2.14 0-.86.47-1.63 1.17-2.05.5-.3 1.08-.48 1.69-.52l-.49-2.63c-.14.02-.28.03-.43.03-1.12 0-2.14.59-2.71 1.5-.47.75-.54 1.67-.39 2.55-.67.32-1.26.83-1.68 1.48z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="cart.html">Cart</a></li>
+          </ul>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <p>📍 Ghana</p>
+          <p>📞 <a href="tel:0540421116">0540421116</a></p>
+          <p>✉️ <a href="mailto:sweettreets1122@gmail.com">sweettreets1122@gmail.com</a></p>
+        </div>
+        
+        <!-- Business Hours -->
+        <div class="footer-section">
+          <h4>Business Hours</h4>
+          <p>Monday - Friday: 8AM - 8PM</p>
+          <p>Saturday: 9AM - 6PM</p>
+          <p>Sunday: 10AM - 4PM</p>
+        </div>
+      </div>
+      
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p>© 2026 Sweet Treets. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="main.js"></script>
+  <script>
+    // Checkout page specific initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCheckoutItems();
+      updateCheckoutSummary();
+    });
+
+    // Render checkout items
+    function renderCheckoutItems() {
+      const container = document.getElementById('checkout-items');
+      if (!container) return;
+      
+      const items = cart.getItems();
+      
+      if (items.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--color-text-light); padding: var(--spacing-lg);">Your cart is empty</p>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.style.cssText = `
+          display: flex;
+          gap: var(--spacing-md);
+          padding: var(--spacing-md) 0;
+          border-bottom: 1px solid var(--color-border);
+        `;
+        
+        itemElement.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-md);">
+          <div style="flex: 1;">
+            <p style="font-weight: 600; margin-bottom: var(--spacing-xs);">${item.name}</p>
+            <p style="font-size: var(--font-size-sm); color: var(--color-text-light);">Qty: ${item.quantity}</p>
+          </div>
+          <div style="font-weight: 600;">${formatPrice(item.price * item.quantity)}</div>
+        `;
+        
+        container.appendChild(itemElement);
+      });
+    }
+  </script>
+</body>
+</html>
