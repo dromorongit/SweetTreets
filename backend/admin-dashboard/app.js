@@ -129,8 +129,7 @@ async function handleLogin(e) {
   const btn = loginForm.querySelector('button[type="submit"]');
   
   // Show loading
-  btn.querySelector('.btn-text').classList.add('hidden');
-  btn.querySelector('.btn-loader').classList.remove('hidden');
+  btn.classList.add('loading');
   btn.disabled = true;
   
   try {
@@ -158,8 +157,7 @@ async function handleLogin(e) {
     errorDiv.textContent = 'Connection error. Please try again.';
     errorDiv.classList.remove('hidden');
   } finally {
-    btn.querySelector('.btn-text').classList.remove('hidden');
-    btn.querySelector('.btn-loader').classList.add('hidden');
+    btn.classList.remove('loading');
     btn.disabled = false;
   }
 }
@@ -263,8 +261,7 @@ async function handleAddProduct(e) {
   const formData = new FormData(form);
   
   // Show loading
-  btn.querySelector('.btn-text').classList.add('hidden');
-  btn.querySelector('.btn-loader').classList.remove('hidden');
+  btn.classList.add('loading');
   btn.disabled = true;
   
   try {
@@ -288,8 +285,7 @@ async function handleAddProduct(e) {
   } catch (error) {
     showToast('Connection error', 'error');
   } finally {
-    btn.querySelector('.btn-text').classList.remove('hidden');
-    btn.querySelector('.btn-loader').classList.add('hidden');
+    btn.classList.remove('loading');
     btn.disabled = false;
   }
 }
@@ -338,8 +334,7 @@ async function handleEditProduct(e) {
   const formData = new FormData(form);
   
   // Show loading
-  btn.querySelector('.btn-text').classList.add('hidden');
-  btn.querySelector('.btn-loader').classList.remove('hidden');
+  btn.classList.add('loading');
   btn.disabled = true;
   
   try {
@@ -364,8 +359,7 @@ async function handleEditProduct(e) {
   } catch (error) {
     showToast('Connection error', 'error');
   } finally {
-    btn.querySelector('.btn-text').classList.remove('hidden');
-    btn.querySelector('.btn-loader').classList.add('hidden');
+    btn.classList.remove('loading');
     btn.disabled = false;
   }
 }
