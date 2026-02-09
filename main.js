@@ -4,7 +4,7 @@
  */
 
 // API Configuration
-const API_BASE = '/api';
+const API_BASE = 'https://sweettreets-production.up.railway.app/api';
 
 // Products cache
 let productsCache = [];

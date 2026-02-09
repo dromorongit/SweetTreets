@@ -2,7 +2,7 @@
  * Sweet Treets Admin Dashboard JavaScript
  */
 
-const API_BASE = '/api';
+const API_BASE = 'https://sweettreets-production.up.railway.app/api';
 
 // State
 let token = localStorage.getItem('adminToken');
