@@ -14,6 +14,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Log Cloudinary config status (for debugging)
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  console.log('✅ Cloudinary configured successfully');
+} else {
+  console.log('⚠️ Cloudinary CLOUD_NAME not set - uploads will fail');
+}
+
 // Storage configuration for Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
