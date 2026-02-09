@@ -78,8 +78,8 @@
               
               <div class="form-row">
                 <div class="form-group">
-                  <label for="email" class="form-label">Email Address *</label>
-                  <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
+                  <label for="email" class="form-label">Email Address</label>
+                  <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                   <label for="phone" class="form-label">Phone Number *</label>
@@ -139,21 +139,23 @@
             
             <!-- Payment Information -->
             <div class="form-section">
-              <h3>Payment Method</h3>
+              <h3>Payment Information</h3>
+              
+              <!-- Payment Details Box -->
+              <div class="payment-details-box">
+                <h4>📱 Payment Details</h4>
+                <p><strong>Mobile Money / Bank Transfer to:</strong></p>
+                <p class="payment-number">+233 54 042 1116 (Alice Malm)</p>
+                <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-top: var(--spacing-sm);">
+                  After payment, please upload your receipt below.
+                </p>
+              </div>
               
               <div class="form-group">
                 <label class="form-label">Select Payment Method *</label>
                 <div style="display: flex; flex-direction: column; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
                   <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
-                    <input type="radio" name="paymentMethod" value="cod" checked style="width: 20px; height: 20px;">
-                    <div>
-                      <strong>Cash on Delivery</strong>
-                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Pay when you receive your order</p>
-                    </div>
-                  </label>
-                  
-                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
-                    <input type="radio" name="paymentMethod" value="momo" style="width: 20px; height: 20px;">
+                    <input type="radio" name="paymentMethod" value="momo" checked style="width: 20px; height: 20px;" onchange="toggleReceiptUpload()">
                     <div>
                       <strong>Mobile Money</strong>
                       <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">MTN, AirtelTigo, or Vodafone</p>
@@ -161,13 +163,68 @@
                   </label>
                   
                   <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
-                    <input type="radio" name="paymentMethod" value="bank" style="width: 20px; height: 20px;">
+                    <input type="radio" name="paymentMethod" value="bank" style="width: 20px; height: 20px;" onchange="toggleReceiptUpload()">
                     <div>
                       <strong>Bank Transfer</strong>
                       <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Direct bank transfer</p>
                     </div>
                   </label>
+                  
+                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: border-color var(--transition-fast);">
+                    <input type="radio" name="paymentMethod" value="cod" style="width: 20px; height: 20px;" onchange="toggleReceiptUpload()">
+                    <div>
+                      <strong>Cash on Delivery</strong>
+                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Pay when you receive your order</p>
+                    </div>
+                  </label>
                 </div>
+              </div>
+              
+              <!-- Receipt Upload -->
+              <div class="form-group" id="receipt-upload-group">
+                <label for="receipt" class="form-label">Upload Payment Receipt *</label>
+                <div class="file-upload-wrapper">
+                  <input type="file" id="receipt" name="receipt" class="file-upload-input" accept="image/*" onchange="previewReceipt(this)">
+                  <div class="file-upload-content" id="file-upload-content">
+                    <div class="file-upload-icon">📄</div>
+                    <p>Click or drag to upload receipt</p>
+                    <p style="font-size: var(--font-size-sm); color: var(--color-text-light);">PNG, JPG up to 5MB</p>
+                  </div>
+                  <img id="receipt-preview" class="receipt-preview-img" style="display: none;">
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Fee Notice -->
+            <div class="form-section">
+              <h3>Delivery Information</h3>
+              
+              <div class="delivery-fee-notice">
+                <p>📦 <strong>Delivery Fees:</strong></p>
+                <ul>
+                  <li>Within Accra: ₵35.00</li>
+                  <li>Outside Accra: Fees will be communicated after checkout</li>
+                </ul>
+                <p style="font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">*Orders paid before 2:00 PM qualify for next-day delivery</p>
+              </div>
+            </div>
+            
+            <!-- Policy Agreement -->
+            <div class="form-section">
+              <h3>Terms & Policies</h3>
+              
+              <div class="policy-agreement">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="policyAgreement" required>
+                  <span class="checkbox-custom"></span>
+                  <span>I agree to the <a href="policy.html" target="_blank">Terms & Policies</a> *</span>
+                </label>
+                
+                <label class="checkbox-label">
+                  <input type="checkbox" id="paymentConfirmation">
+                  <span class="checkbox-custom"></span>
+                  <span>I confirm that I have made the payment to +233 54 042 1116 (Alice Malm) *</span>
+                </label>
               </div>
             </div>
             
@@ -199,19 +256,19 @@
             </div>
             
             <div class="summary-row">
-              <span>Shipping</span>
-              <span>Calculated after order</span>
+              <span>Delivery (Accra)</span>
+              <span id="checkout-delivery">₵35.00</span>
             </div>
             
             <div class="summary-row total">
               <span>Total</span>
-              <span id="checkout-total">₵0.00</span>
+              <span id="checkout-total">₵35.00</span>
             </div>
           </div>
           
           <!-- Place Order Button -->
           <button type="submit" form="checkout-form" class="btn btn-primary checkout-btn" style="width: 100%;">
-            Place Order
+            Complete Order
           </button>
           
           <!-- Security Info -->
@@ -283,8 +340,8 @@
               </svg>
             </a>
             <a href="https://snapchat.com/t/ZTYdjHV6" class="social-link" target="_blank" rel="noopener" aria-label="Snapchat">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.03 2 11c0 1.89.55 3.63 1.48 5.09l.96-2.23c-.42-.73-.66-1.56-.66-2.46 0-3.53 3.26-6.4 7.22-6.4s7.22 2.87 7.22 6.4c0 .9-.24 1.73-.66 2.46l.96 2.23C21.45 14.63 22 12.89 22 11c0-4.97-4.48-9-10-9zm-4.68 8.1c-.5.83-1.55 1.4-2.66 1.4-.31 0-.61-.05-.9-.13l1.11-2.6c.57.28 1.22.44 1.91.44.94 0 1.8-.36 2.45-.95.63.54 1.44.87 2.33.87.77 0 1.49-.29 2.04-.76l1.21 2.51c-.36.17-.73.3-1.12.39-1.11.24-2.24-.05-3.13-.78-.66-.54-1.03-1.32-1.03-2.14 0-.86.47-1.63 1.17-2.05.5-.3 1.08-.48 1.69-.52l-.49-2.63c-.14.02-.28.03-.43.03-1.12 0-2.14.59-2.71 1.5-.47.75-.54 1.67-.39 2.55-.67.32-1.26.83-1.68 1.48z"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFC00">
+                <path d="M12.083 21.72c-2.547.063-4.607-.803-5.643-2.165l-1.211 1.762c1.358 1.741 3.652 2.616 6.067 2.553 2.794-.063 5.285-1.352 6.885-3.613l1.24 1.689c-1.878 2.654-4.752 3.774-7.338 3.774zM9.571 18.747c-.654.942-1.567 1.297-2.567 1.115.462-1.083 1.04-2.156 1.74-3.058 1.211-1.528 2.742-2.219 4.641-2.219 1.055 0 2.091.298 3.001.78-.692.955-1.238 2.031-1.568 3.171-.654 2.219-.392 4.306.654 5.988l-1.568.654c-.817-1.971-.905-4.09-.327-6.097a8.27 8.27 0 0 0-3.006.666zm3.996-5.332c1.568 0 2.742-1.24 2.742-2.742 0-1.568-1.174-2.742-2.742-2.742-1.568 0-2.742 1.174-2.742 2.742 0 1.502 1.174 2.742 2.742 2.zm4.742-2.742c0 2.654-2.155 4.809-4.742 4.809s-4.742-2.155-4.742-4.809c0-2.654 2.155-4.809 4.742-4.809s4.742 2.155 4.742 4.809z"/>
               </svg>
             </a>
           </div>
@@ -333,7 +390,47 @@
     document.addEventListener('DOMContentLoaded', () => {
       renderCheckoutItems();
       updateCheckoutSummary();
+      toggleReceiptUpload();
     });
+
+    // Toggle receipt upload visibility based on payment method
+    function toggleReceiptUpload() {
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      const receiptGroup = document.getElementById('receipt-upload-group');
+      const receiptInput = document.getElementById('receipt');
+      const policyCheckbox = document.getElementById('policyAgreement');
+      const paymentCheckbox = document.getElementById('paymentConfirmation');
+      
+      if (paymentMethod === 'cod') {
+        // Cash on delivery - receipt not required
+        receiptGroup.style.display = 'none';
+        receiptInput.removeAttribute('required');
+        paymentCheckbox.removeAttribute('required');
+      } else {
+        // Mobile money or bank transfer - receipt required
+        receiptGroup.style.display = 'block';
+        receiptInput.setAttribute('required', 'required');
+        paymentCheckbox.setAttribute('required', 'required');
+      }
+    }
+
+    // Preview receipt image
+    function previewReceipt(input) {
+      const preview = document.getElementById('receipt-preview');
+      const content = document.getElementById('file-upload-content');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          content.style.display = 'none';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
 
     // Render checkout items
     function renderCheckoutItems() {

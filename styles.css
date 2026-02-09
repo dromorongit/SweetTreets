@@ -650,6 +650,23 @@ h6 { font-size: var(--font-size-base); }
   margin-bottom: var(--spacing-xl);
 }
 
+/* Cart Delivery Notice */
+.cart-delivery-notice {
+  background-color: var(--color-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.cart-delivery-notice p {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}
+
+.cart-delivery-notice p:last-child {
+  margin-bottom: 0;
+}
+
 /* =============================================
    Checkout Page
    ============================================= */
@@ -708,6 +725,171 @@ h6 { font-size: var(--font-size-base); }
 .form-input:focus {
   outline: none;
   border-color: var(--color-accent);
+}
+
+/* Payment Details Box */
+.payment-details-box {
+  background-color: var(--color-secondary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.payment-details-box h4 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.payment-number {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-top: var(--spacing-sm);
+}
+
+/* File Upload Wrapper */
+.file-upload-wrapper {
+  position: relative;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  text-align: center;
+  transition: border-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.file-upload-wrapper:hover {
+  border-color: var(--color-accent);
+}
+
+.file-upload-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.file-upload-icon {
+  font-size: 2rem;
+}
+
+.file-upload-content p {
+  color: var(--color-text-light);
+}
+
+.receipt-preview-img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: var(--radius-md);
+}
+
+/* Delivery Fee Notice */
+.delivery-fee-notice {
+  background-color: var(--color-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.delivery-fee-notice ul {
+  list-style: disc;
+  margin-left: var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+}
+
+.delivery-fee-notice li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Policy Agreement */
+.policy-agreement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.checkbox-label:hover {
+  background-color: var(--color-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.checkbox-label span:last-child {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.checkbox-label a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+/* =============================================
+   Policy Page Styles
+   ============================================= */
+.policy-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.policy-card {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.policy-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.policy-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.policy-card h3 {
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-lg);
+}
+
+.policy-list {
+  list-style: disc;
+  margin-left: var(--spacing-lg);
+}
+
+.policy-list li {
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.6;
 }
 
 /* =============================================
@@ -1031,6 +1213,10 @@ h6 { font-size: var(--font-size-base); }
   
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .policy-container {
+    grid-template-columns: 1fr;
   }
 }
 

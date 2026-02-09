@@ -1,182 +1,96 @@
 /**
  * Sweet Treets E-Commerce Website JavaScript
- * Vanilla JavaScript ES6+ for cart functionality and dynamic behavior
+ * Vanilla JavaScript ES6+ with Backend API Integration
  */
 
+// API Configuration
+const API_BASE = '/api';
+
+// Products cache
+let productsCache = [];
+
 // =============================================
-// Product Data
+// API Functions
 // =============================================
-const products = [
-  // New Products
-  {
-    id: 1,
-    name: "Japanese Matcha Kit",
-    price: 85.00,
-    category: "new",
-    image: "https://images.unsplash.com/photo-1515814472071-4d632dbc5d4a?w=400&h=400&fit=crop",
-    description: "Authentic Japanese matcha starter kit with ceremonial grade powder"
-  },
-  {
-    id: 2,
-    name: "Korean Bibimbap Instant",
-    price: 12.00,
-    category: "new",
-    image: "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=400&h=400&fit=crop",
-    description: "Premium instant bibimbap from Korea"
-  },
-  {
-    id: 3,
-    name: "Thai Mango Sticky Rice",
-    price: 15.00,
-    category: "new",
-    image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=400&fit=crop",
-    description: "Authentic Thai mango sticky rice kit"
-  },
-  {
-    id: 4,
-    name: "Vietnamese Egg Coffee",
-    price: 18.00,
-    category: "new",
-    image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop",
-    description: "Traditional Vietnamese egg coffee mix"
-  },
-  
-  // Fast Selling Products
-  {
-    id: 5,
-    name: "Pocky Chocolate",
-    price: 8.00,
-    category: "fast",
-    image: "https://images.unsplash.com/photo-1548907040-4baa42d10919?w=400&h=400&fit=crop",
-    description: "Classic Japanese chocolate biscuit sticks"
-  },
-  {
-    id: 6,
-    name: "Mochi Ice Cream Variety",
-    price: 22.00,
-    category: "fast",
-    image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=400&fit=crop",
-    description: "Assorted Japanese mochi ice cream"
-  },
-  {
-    id: 7,
-    name: "KitKat Chocolates",
-    price: 10.00,
-    category: "fast",
-    image: "https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=400&h=400&fit=crop",
-    description: "Premium Japanese KitKat assortment"
-  },
-  {
-    id: 8,
-    name: "Bubble Tea Kit",
-    price: 35.00,
-    category: "fast",
-    image: "https://images.unsplash.com/photo-1558857563-b371033873b8?w=400&h=400&fit=crop",
-    description: "DIY bubble tea kit with multiple flavors"
-  },
-  
-  // Snacks Category
-  {
-    id: 9,
-    name: "Seaweed Snacks",
-    price: 6.00,
-    category: "snacks",
-    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=400&fit=crop",
-    description: "Crispy Japanese seaweed snacks"
-  },
-  {
-    id: 10,
-    name: "Rice Crackers",
-    price: 7.50,
-    category: "snacks",
-    image: "https://images.unsplash.com/photo-1588449668365-515aa6041c5f?w=400&h=400&fit=crop",
-    description: "Traditional Japanese rice crackers"
-  },
-  {
-    id: 11,
-    name: "Wasabi Peas",
-    price: 5.00,
-    category: "snacks",
-    image: "https://images.unsplash.com/photo-1599599810769-bcde5a45dd03?w=400&h=400&fit=crop",
-    description: "Spicy wasabi coated peas"
-  },
-  {
-    id: 12,
-    name: "Shrimp Crackers",
-    price: 8.00,
-    category: "snacks",
-    image: "https://images.unsplash.com/photo-1621939514649-28b12e81658b?w=400&h=400&fit=crop",
-    description: "Crispy Thai shrimp crackers"
-  },
-  
-  // Drinks Category
-  {
-    id: 13,
-    name: "Ramune Soda",
-    price: 4.50,
-    category: "drinks",
-    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop",
-    description: "Classic Japanese marble soda"
-  },
-  {
-    id: 14,
-    name: "Calpis Water",
-    price: 5.00,
-    category: "drinks",
-    image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=400&fit=crop",
-    description: "Traditional Japanese probiotic drink"
-  },
-  {
-    id: 15,
-    name: "Yakult Probiotic",
-    price: 3.00,
-    category: "drinks",
-    image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=400&fit=crop",
-    description: "Probiotic fermented milk drink"
-  },
-  {
-    id: 16,
-    name: "Kombucha Tea",
-    price: 7.00,
-    category: "drinks",
-    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop",
-    description: "Fermented probiotic tea"
-  },
-  
-  // Groceries Category
-  {
-    id: 17,
-    name: "Japanese Soy Sauce",
-    price: 12.00,
-    category: "groceries",
-    image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=400&h=400&fit=crop",
-    description: "Premium Japanese soy sauce"
-  },
-  {
-    id: 18,
-    name: "Sushi Rice",
-    price: 9.00,
-    category: "groceries",
-    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop",
-    description: "Short grain Japanese sushi rice"
-  },
-  {
-    id: 19,
-    name: "Curry Roux Box",
-    price: 15.00,
-    category: "groceries",
-    image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=400&fit=crop",
-    description: "Japanese curry roux mix"
-  },
-  {
-    id: 20,
-    name: "Miso Paste",
-    price: 10.00,
-    category: "groceries",
-    image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=400&fit=crop",
-    description: "Authentic Japanese miso paste"
+
+// Fetch all products
+async function fetchProducts() {
+  try {
+    const response = await fetch(`${API_BASE}/products`);
+    const data = await response.json();
+    if (data.success) {
+      productsCache = data.data;
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
   }
-];
+}
+
+// Fetch products by category
+async function fetchProductsByCategory(category) {
+  try {
+    const response = await fetch(`${API_BASE}/products/category/${category}`);
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    return [];
+  }
+}
+
+// Fetch new arrivals
+async function fetchNewArrivals() {
+  try {
+    const response = await fetch(`${API_BASE}/products/new-arrivals`);
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching new arrivals:', error);
+    return [];
+  }
+}
+
+// Fetch fast selling products
+async function fetchFastSelling() {
+  try {
+    const response = await fetch(`${API_BASE}/products/fast-selling`);
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching fast selling products:', error);
+    return [];
+  }
+}
+
+// Deduct stock after order
+async function deductStock(productId, quantity) {
+  try {
+    const response = await fetch(`${API_BASE}/products/deduct-stock/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ quantity })
+    });
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error deducting stock:', error);
+    return false;
+  }
+}
 
 // =============================================
 // Cart Management
@@ -209,7 +123,7 @@ class Cart {
 
   // Add item to cart
   addItem(productId, quantity = 1) {
-    const product = products.find(p => p.id === productId);
+    const product = productsCache.find(p => p._id === productId);
     if (!product) return false;
 
     const existingItem = this.items.find(item => item.id === productId);
@@ -218,11 +132,12 @@ class Cart {
       existingItem.quantity += quantity;
     } else {
       this.items.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: quantity
+        id: product._id,
+        name: product.productName,
+        price: product.originalPrice,
+        image: product.mainImage,
+        quantity: quantity,
+        stockNumber: product.stockNumber
       });
     }
 
@@ -337,26 +252,33 @@ class Cart {
 
 // Format price in GHS format
 function formatPrice(price) {
-  return `₵${price.toFixed(2)}`;
+  return `₵${parseFloat(price).toFixed(2)}`;
 }
 
 // Create product card HTML
 function createProductCard(product) {
   const card = document.createElement('div');
   card.className = 'product-card fade-in';
-  card.dataset.productId = product.id;
-  card.dataset.category = product.category;
+  card.dataset.productId = product._id;
+  card.dataset.categories = product.categories ? product.categories.join(',') : '';
+  
+  const imageUrl = product.mainImage || 'https://via.placeholder.com/400x400?text=No+Image';
+  const price = product.salesPrice && product.salesPrice < product.originalPrice 
+    ? `<span style="text-decoration: line-through; color: var(--color-text-light); font-size: 0.9rem;">${formatPrice(product.originalPrice)}</span> ${formatPrice(product.salesPrice)}`
+    : formatPrice(product.originalPrice);
   
   card.innerHTML = `
     <div class="product-image">
-      <img src="${product.image}" alt="${product.name}" loading="lazy">
+      <img src="${imageUrl}" alt="${product.productName}" loading="lazy">
     </div>
     <div class="product-info">
-      <h3 class="product-name">${product.name}</h3>
-      <p class="product-price">${formatPrice(product.price)}</p>
-      <button class="btn btn-primary product-btn" onclick="cart.addItem(${product.id})">
-        Add to Cart
-      </button>
+      <h3 class="product-name">${product.productName}</h3>
+      <p class="product-price">${price}</p>
+      <p style="font-size: 0.875rem; color: var(--color-text-light); margin-bottom: 0.5rem;">${product.shortDescription || ''}</p>
+      ${product.stockNumber > 0 
+        ? `<button class="btn btn-primary product-btn" onclick="cart.addItem('${product._id}')">Add to Cart</button>`
+        : `<button class="btn btn-primary product-btn" disabled style="background-color: var(--color-text-light); cursor: not-allowed;">Out of Stock</button>`
+      }
     </div>
   `;
   
@@ -371,7 +293,7 @@ function createCartItem(item) {
   
   cartItem.innerHTML = `
     <div class="cart-item-image">
-      <img src="${item.image}" alt="${item.name}">
+      <img src="${item.image || 'https://via.placeholder.com/100x100'}" alt="${item.name}">
     </div>
     <div class="cart-item-details">
       <h4 class="cart-item-name">${item.name}</h4>
@@ -379,11 +301,11 @@ function createCartItem(item) {
     </div>
     <div class="cart-item-actions">
       <div class="quantity-control">
-        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+        <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
         <span class="quantity-value">${item.quantity}</span>
-        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+        <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
       </div>
-      <button class="remove-btn" onclick="cart.removeItem(${item.id}); renderCartItems();">Remove</button>
+      <button class="remove-btn" onclick="cart.removeItem('${item.id}'); renderCartItems();">Remove</button>
     </div>
   `;
   
@@ -448,7 +370,9 @@ function updateCartSummary() {
   }
   
   if (totalElement) {
-    totalElement.textContent = formatPrice(cart.getTotal());
+    const deliveryFee = 35.00;
+    const totalWithDelivery = cart.getTotal() + deliveryFee;
+    totalElement.textContent = formatPrice(totalWithDelivery);
   }
 }
 
@@ -457,11 +381,17 @@ function updateCartSummary() {
 // =============================================
 
 // Render new products
-function renderNewProducts() {
+async function renderNewProducts() {
   const container = document.getElementById('new-products');
   if (!container) return;
   
-  const newProducts = products.filter(p => p.category === 'new');
+  const newProducts = await fetchNewArrivals();
+  
+  if (newProducts.length === 0) {
+    container.innerHTML = '<p class="text-center">No new arrivals at the moment</p>';
+    return;
+  }
+  
   container.innerHTML = '';
   newProducts.forEach(product => {
     container.appendChild(createProductCard(product));
@@ -469,11 +399,17 @@ function renderNewProducts() {
 }
 
 // Render fast selling products
-function renderFastSellingProducts() {
+async function renderFastSellingProducts() {
   const container = document.getElementById('fast-selling');
   if (!container) return;
   
-  const fastProducts = products.filter(p => p.category === 'fast');
+  const fastProducts = await fetchFastSelling();
+  
+  if (fastProducts.length === 0) {
+    container.innerHTML = '<p class="text-center">No fast selling products at the moment</p>';
+    return;
+  }
+  
   container.innerHTML = '';
   fastProducts.forEach(product => {
     container.appendChild(createProductCard(product));
@@ -481,9 +417,16 @@ function renderFastSellingProducts() {
 }
 
 // Render shop products
-function renderShopProducts() {
+async function renderShopProducts() {
   const container = document.getElementById('shop-products');
   if (!container) return;
+  
+  const products = await fetchProducts();
+  
+  if (products.length === 0) {
+    container.innerHTML = '<p class="text-center">No products available at the moment</p>';
+    return;
+  }
   
   container.innerHTML = '';
   products.forEach(product => {
@@ -495,11 +438,29 @@ function renderShopProducts() {
 // Tab/Category Filtering
 // =============================================
 
-function initCategoryTabs() {
+async function initCategoryTabs() {
   const tabButtons = document.querySelectorAll('.tab-btn');
   const categoryProducts = document.querySelectorAll('.category-products');
   
   if (tabButtons.length === 0) return;
+  
+  // Load category products
+  const categories = ['Snacks', 'Drinks', 'Groceries'];
+  
+  for (const category of categories) {
+    const container = document.getElementById(`${category.toLowerCase()}-products`);
+    if (container) {
+      const products = await fetchProductsByCategory(category);
+      if (products.length === 0) {
+        container.innerHTML = `<p class="text-center">No ${category.toLowerCase()} available at the moment</p>`;
+      } else {
+        container.innerHTML = '';
+        products.forEach(product => {
+          container.appendChild(createProductCard(product));
+        });
+      }
+    }
+  }
   
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -546,14 +507,50 @@ function initMobileMenu() {
 }
 
 // =============================================
+// WhatsApp Integration
+// =============================================
+
+function generateWhatsAppMessage(order, customer) {
+  const itemsList = order.items.map(item => 
+    `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`
+  ).join('%0A');
+  
+  const message = `🏪 *Sweet Treets Order*%0A%0A` +
+    `*Order ID:* ${order.orderId}%0A%0A` +
+    `*Customer:* ${customer.name}%0A%0A` +
+    `*Items:*%0A${itemsList}%0A%0A` +
+    `*Total Amount:* ${formatPrice(order.total + 35.00)} (incl. delivery)%0A%0A` +
+    `*Delivery Address:*%0A${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
+    `*Phone:* ${customer.phone}%0A%0A` +
+    `📝 Message: I have made payment and attached receipt on the website.`;
+  
+  return message;
+}
+
+function redirectToWhatsApp(order, customer) {
+  const whatsappNumber = '233540421116';
+  const message = generateWhatsAppMessage(order, customer);
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+  
+  window.open(whatsappUrl, '_blank');
+}
+
+// Generate unique order ID
+function generateOrderId() {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `ST-${timestamp}-${random}`;
+}
+
+// =============================================
 // Checkout Functions
 // =============================================
 
-function initCheckoutForm() {
+async function initCheckoutForm() {
   const form = document.getElementById('checkout-form');
   if (!form) return;
   
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     
     // Validate form
@@ -574,42 +571,82 @@ function initCheckoutForm() {
       return;
     }
     
-    // Process order (UI only)
+    // Check payment method and receipt
+    const paymentMethod = form.querySelector('input[name="paymentMethod"]:checked').value;
+    const receiptInput = form.querySelector('#receipt');
+    const paymentConfirmation = form.querySelector('#paymentConfirmation');
+    
+    if (paymentMethod !== 'cod' && (!receiptInput.files || receiptInput.files.length === 0)) {
+      cart.showNotification('Please upload your payment receipt');
+      return;
+    }
+    
+    if (paymentMethod !== 'cod' && (!paymentConfirmation || !paymentConfirmation.checked)) {
+      cart.showNotification('Please confirm that you have made the payment');
+      return;
+    }
+    
+    // Process order
     const orderData = {
+      orderId: generateOrderId(),
       items: cart.getItems(),
       total: cart.getTotal(),
       customer: {
         name: form.querySelector('#fullName')?.value || '',
         email: form.querySelector('#email')?.value || '',
         phone: form.querySelector('#phone')?.value || '',
-        address: form.querySelector('#address')?.value || ''
+        address: form.querySelector('#address')?.value || '',
+        city: form.querySelector('#city')?.value || '',
+        region: form.querySelector('#region')?.value || '',
+        landmark: form.querySelector('#landmark')?.value || '',
+        deliveryNotes: form.querySelector('#deliveryNotes')?.value || ''
       },
+      paymentMethod: paymentMethod,
+      notes: form.querySelector('#orderNotes')?.value || '',
       date: new Date().toISOString()
     };
     
     console.log('Order placed:', orderData);
     
+    // Deduct stock for each item
+    for (const item of orderData.items) {
+      await deductStock(item.id, item.quantity);
+    }
+    
     // Clear cart and show success
     cart.clearCart();
-    cart.showNotification('Order placed successfully!');
+    cart.showNotification('Order submitted! Redirecting to WhatsApp...');
     
-    // Redirect to home after 2 seconds
+    // Redirect to WhatsApp after 1.5 seconds
     setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 2000);
+      redirectToWhatsApp(orderData, orderData.customer);
+      // Redirect to home after WhatsApp
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 3000);
+    }, 1500);
   });
 }
 
 function updateCheckoutSummary() {
   const subtotalElement = document.getElementById('checkout-subtotal');
   const totalElement = document.getElementById('checkout-total');
+  const deliveryElement = document.getElementById('checkout-delivery');
+  
+  const subtotal = cart.getTotal();
+  const deliveryFee = 35.00;
+  const total = subtotal + deliveryFee;
   
   if (subtotalElement) {
-    subtotalElement.textContent = formatPrice(cart.getTotal());
+    subtotalElement.textContent = formatPrice(subtotal);
+  }
+  
+  if (deliveryElement) {
+    deliveryElement.textContent = formatPrice(deliveryFee);
   }
   
   if (totalElement) {
-    totalElement.textContent = formatPrice(cart.getTotal());
+    totalElement.textContent = formatPrice(total);
   }
 }
 
@@ -666,7 +703,7 @@ function initSmoothScroll() {
 // Initialize on DOM Load
 // =============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Initialize cart count on all pages
   cart.updateCartCount();
   
@@ -676,13 +713,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize smooth scroll
   initSmoothScroll();
   
+  // Load products from API
+  await fetchProducts();
+  
   // Render products on home page
-  renderNewProducts();
-  renderFastSellingProducts();
+  await renderNewProducts();
+  await renderFastSellingProducts();
   
   // Initialize shop page
-  renderShopProducts();
-  initCategoryTabs();
+  await renderShopProducts();
+  await initCategoryTabs();
   
   // Initialize cart page
   renderCartItems();
@@ -708,3 +748,8 @@ window.updateQuantity = updateQuantity;
 window.formatPrice = formatPrice;
 window.createProductCard = createProductCard;
 window.createCartItem = createCartItem;
+window.redirectToWhatsApp = redirectToWhatsApp;
+window.generateWhatsAppMessage = generateWhatsAppMessage;
+window.fetchProducts = fetchProducts;
+window.fetchNewArrivals = fetchNewArrivals;
+window.fetchFastSelling = fetchFastSelling;
