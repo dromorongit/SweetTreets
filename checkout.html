@@ -240,9 +240,9 @@
               <span id="checkout-subtotal">₵0.00</span>
             </div>
             
-            <div class="summary-row">
-              <span>Delivery (Accra)</span>
-              <span id="checkout-delivery">₵35.00</span>
+            <div class="summary-row" id="delivery-row">
+              <span>Delivery</span>
+              <span id="checkout-delivery">Select region to calculate</span>
             </div>
             
             <div class="summary-row total">
@@ -375,6 +375,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       renderCheckoutItems();
       updateCheckoutSummary();
+      initRegionListener();
     });
 
     // Handle receipt upload to Cloudinary

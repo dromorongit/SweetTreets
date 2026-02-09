@@ -79,9 +79,23 @@ function setupEventListeners() {
   
   // Add product form
   document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+  document.getElementById('add-product-form').addEventListener('reset', () => {
+    setTimeout(() => {
+      document.getElementById('mainImagePreview').innerHTML = '';
+      document.getElementById('additionalImagesPreview').innerHTML = '';
+    }, 0);
+  });
+  
+  // Image previews for add form
+  document.getElementById('mainImage').addEventListener('change', (e) => handleImagePreview(e, 'mainImagePreview'));
+  document.getElementById('additionalImages').addEventListener('change', (e) => handleMultipleImagePreview(e, 'additionalImagesPreview'));
   
   // Edit form
   document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
+  
+  // Image previews for edit form
+  document.getElementById('edit-mainImage').addEventListener('change', (e) => handleImagePreview(e, 'edit-mainImagePreview'));
+  document.getElementById('edit-additionalImages').addEventListener('change', (e) => handleMultipleImagePreview(e, 'edit-additionalImagesPreview'));
   
   // Modal close buttons
   document.querySelectorAll('.modal-close, .modal-cancel').forEach(btn => {
@@ -94,6 +108,68 @@ function setupEventListeners() {
   
   // Delete confirmation
   document.getElementById('confirm-delete-btn').addEventListener('click', handleDelete);
+}
+
+// Handle single image preview
+function handleImagePreview(event, previewContainerId) {
+  const file = event.target.files[0];
+  const container = document.getElementById(previewContainerId);
+  
+  if (!container) return;
+  
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      container.innerHTML = `
+        <div class="image-preview-item">
+          <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid var(--color-border);">
+          <button type="button" class="remove-image" onclick="removePreview('${previewContainerId}')">×</button>
+        </div>
+      `;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    container.innerHTML = '';
+  }
+}
+
+// Handle multiple images preview
+function handleMultipleImagePreview(event, previewContainerId) {
+  const files = event.target.files;
+  const container = document.getElementById(previewContainerId);
+  
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  if (files && files.length > 0) {
+    Array.from(files).forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'image-preview-item';
+        previewItem.innerHTML = `
+          <img src="${e.target.result}" alt="Preview ${index + 1}" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid var(--color-border);">
+        `;
+        container.appendChild(previewItem);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+// Remove image preview
+function removePreview(previewContainerId) {
+  const container = document.getElementById(previewContainerId);
+  if (container) {
+    container.innerHTML = '';
+  }
+  // Also clear the file input
+  const inputId = previewContainerId.replace('Preview', '');
+  const input = document.getElementById(inputId);
+  if (input) {
+    input.value = '';
+  }
 }
 
 // Show login page
@@ -491,3 +567,6 @@ function debounce(func, wait) {
 // Make functions globally accessible
 window.openEditModal = openEditModal;
 window.openDeleteModal = openDeleteModal;
+window.removePreview = removePreview;
+window.handleImagePreview = handleImagePreview;
+window.handleMultipleImagePreview = handleMultipleImagePreview;

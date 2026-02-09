@@ -77,18 +77,18 @@ async function fetchNewArrivals() {
   }
 }
 
-// Fetch fast selling products
-async function fetchFastSelling() {
+// Fetch a single product by ID
+async function fetchProductById(productId) {
   try {
-    const response = await fetch(`${API_BASE}/products/fast-selling`);
+    const response = await fetch(`${API_BASE}/products/${productId}`);
     const data = await response.json();
     if (data.success) {
       return data.data;
     }
-    return [];
+    return null;
   } catch (error) {
-    console.error('Error fetching fast selling products:', error);
-    return [];
+    console.error('Error fetching product:', error);
+    return null;
   }
 }
 
@@ -288,6 +288,9 @@ function createProductCard(product) {
   card.innerHTML = `
     <div class="product-image">
       <img src="${imageUrl}" alt="${product.productName}" loading="lazy">
+      <div class="product-hover-overlay">
+        <a href="product.html?id=${product._id}" class="view-details-btn">View Details</a>
+      </div>
     </div>
     <div class="product-info">
       <h3 class="product-name">${product.productName}</h3>
@@ -535,11 +538,17 @@ function generateWhatsAppMessage(order, customer) {
     `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`
   ).join('%0A');
   
+  // Calculate delivery fee based on region
+  const isGreaterAccra = customer.region === 'greater-accra';
+  const deliveryFee = isGreaterAccra ? 35.00 : 0;
+  const deliveryText = isGreaterAccra ? '₵35.00' : 'To be discussed';
+  
   let message = `🏪 *Sweet Treets Order*%0A%0A` +
     `*Order ID:* ${order.orderId}%0A%0A` +
     `*Customer:* ${customer.name}%0A%0A` +
     `*Items:*%0A${itemsList}%0A%0A` +
-    `*Total Amount:* ${formatPrice(order.total + 35.00)} (incl. delivery)%0A%0A` +
+    `*Delivery Fee:* ${deliveryText}%0A%0A` +
+    `*Total Amount:* ${formatPrice(order.total + deliveryFee)}%0A%0A` +
     `*Delivery Address:*%0A${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
     `*Phone:* ${customer.phone}%0A%0A`;
   
@@ -671,9 +680,23 @@ function updateCheckoutSummary() {
   const subtotalElement = document.getElementById('checkout-subtotal');
   const totalElement = document.getElementById('checkout-total');
   const deliveryElement = document.getElementById('checkout-delivery');
+  const deliveryRow = document.getElementById('delivery-row');
   
   const subtotal = cart.getTotal();
-  const deliveryFee = 35.00;
+  const regionSelect = document.getElementById('region');
+  const selectedRegion = regionSelect ? regionSelect.value : '';
+  
+  // Check if Greater Accra is selected
+  const isGreaterAccra = selectedRegion === 'greater-accra';
+  
+  let deliveryFee = 0;
+  let deliveryText = 'To be discussed';
+  
+  if (isGreaterAccra) {
+    deliveryFee = 35.00;
+    deliveryText = '₵35.00';
+  }
+  
   const total = subtotal + deliveryFee;
   
   if (subtotalElement) {
@@ -681,11 +704,29 @@ function updateCheckoutSummary() {
   }
   
   if (deliveryElement) {
-    deliveryElement.textContent = formatPrice(deliveryFee);
+    deliveryElement.textContent = deliveryText;
+    // Add styling for "to be discussed" message
+    if (!isGreaterAccra) {
+      deliveryElement.style.color = 'var(--color-text-light)';
+      deliveryElement.style.fontSize = 'var(--font-size-sm)';
+    } else {
+      deliveryElement.style.color = '';
+      deliveryElement.style.fontSize = '';
+    }
   }
   
   if (totalElement) {
     totalElement.textContent = formatPrice(total);
+  }
+}
+
+// Initialize region change listener for checkout page
+function initRegionListener() {
+  const regionSelect = document.getElementById('region');
+  if (regionSelect) {
+    regionSelect.addEventListener('change', () => {
+      updateCheckoutSummary();
+    });
   }
 }
 
@@ -739,6 +780,191 @@ function initSmoothScroll() {
 }
 
 // =============================================
+// Product Details Page
+// =============================================
+
+async function renderProductDetails() {
+  const productContainer = document.getElementById('product-details');
+  if (!productContainer) return;
+  
+  // Get product ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id');
+  
+  if (!productId) {
+    productContainer.innerHTML = `
+      <div class="empty-cart" style="grid-column: 1 / -1;">
+        <div class="empty-cart-icon">❌</div>
+        <h3>Product Not Found</h3>
+        <p>Sorry, we couldn't find the product you're looking for.</p>
+        <a href="shop.html" class="btn btn-primary">Back to Shop</a>
+      </div>
+    `;
+    return;
+  }
+  
+  // Fetch product from API
+  const product = await fetchProductById(productId);
+  
+  if (!product) {
+    productContainer.innerHTML = `
+      <div class="empty-cart" style="grid-column: 1 / -1;">
+        <div class="empty-cart-icon">❌</div>
+        <h3>Product Not Found</h3>
+        <p>Sorry, we couldn't find the product you're looking for.</p>
+        <a href="shop.html" class="btn btn-primary">Back to Shop</a>
+      </div>
+    `;
+    return;
+  }
+  
+  // Update page title
+  document.title = `${product.productName} - Sweet Treets`;
+  
+  // Get image URL
+  const mainImageUrl = getFullImageUrl(product.mainImage);
+  const additionalImages = product.additionalImages || [];
+  
+  // Calculate price
+  const hasDiscount = product.salesPrice && product.salesPrice < product.originalPrice;
+  const priceDisplay = hasDiscount 
+    ? `<span style="text-decoration: line-through; color: var(--color-text-light); font-size: 1.25rem;">${formatPrice(product.originalPrice)}</span> <span style="color: var(--color-accent); font-size: 2rem; font-weight: 700;">${formatPrice(product.salesPrice)}</span>`
+    : `<span style="color: var(--color-accent); font-size: 2rem; font-weight: 700;">${formatPrice(product.originalPrice)}</span>`;
+  
+  // Calculate discount percentage
+  const discountPercent = hasDiscount 
+    ? Math.round((1 - product.salesPrice / product.originalPrice) * 100)
+    : 0;
+  
+  // Stock status
+  const isInStock = product.stockNumber > 0;
+  const stockStatus = isInStock 
+    ? `<span style="color: var(--color-success);">In Stock (${product.stockNumber} available)</span>`
+    : `<span style="color: var(--color-error);">Out of Stock</span>`;
+  
+  // Render product details
+  productContainer.innerHTML = `
+    <div class="product-gallery">
+      <div class="main-image">
+        <img id="main-product-image" src="${mainImageUrl}" alt="${product.productName}">
+        ${hasDiscount ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
+      </div>
+      ${additionalImages.length > 0 ? `
+        <div class="thumbnail-images">
+          ${additionalImages.map((img, index) => `
+            <img src="${getFullImageUrl(img)}" alt="${product.productName} - Image ${index + 1}" 
+                 onclick="changeMainImage('${getFullImageUrl(img)}')" 
+                 class="thumbnail ${index === 0 ? 'active' : ''}">
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+    
+    <div class="product-info-details">
+      <h1>${product.productName}</h1>
+      
+      <div class="product-meta">
+        <span class="stock-status">${stockStatus}</span>
+        ${product.origin ? `<span class="origin-badge">Origin: ${product.origin}</span>` : ''}
+        ${product.brand ? `<span class="brand-badge">Brand: ${product.brand}</span>` : ''}
+      </div>
+      
+      <div class="product-price-section">
+        ${priceDisplay}
+        ${hasDiscount ? `<span style="color: var(--color-text-light); margin-left: var(--spacing-md);">Save ${formatPrice(product.originalPrice - product.salesPrice)}</span>` : ''}
+      </div>
+      
+      ${product.shortDescription ? `
+        <div class="product-short-description">
+          <p>${product.shortDescription}</p>
+        </div>
+      ` : ''}
+      
+      ${product.description ? `
+        <div class="product-description">
+          <h3>Product Description</h3>
+          <p>${product.description}</p>
+        </div>
+      ` : ''}
+      
+      ${product.ingredients ? `
+        <div class="product-ingredients">
+          <h3>Ingredients</h3>
+          <p>${product.ingredients}</p>
+        </div>
+      ` : ''}
+      
+      ${product.nutritionalInfo ? `
+        <div class="product-nutritional">
+          <h3>Nutritional Information</h3>
+          <p>${product.nutritionalInfo}</p>
+        </div>
+      ` : ''}
+      
+      <div class="product-actions">
+        <div class="quantity-selector">
+          <label for="quantity">Quantity:</label>
+          <div class="quantity-control">
+            <button class="quantity-btn" onclick="changeProductQuantity(-1)">-</button>
+            <input type="number" id="quantity" value="1" min="1" max="${product.stockNumber}" readonly>
+            <button class="quantity-btn" onclick="changeProductQuantity(1)">+</button>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary add-to-cart-btn" onclick="addToCartFromDetails('${product._id}')" ${!isInStock ? 'disabled' : ''}>
+          ${isInStock ? 'Add to Cart' : 'Out of Stock'}
+        </button>
+      </div>
+      
+      ${product.tags && product.tags.length > 0 ? `
+        <div class="product-tags">
+          <span style="color: var(--color-text-light);">Tags:</span>
+          ${product.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// Change main image when thumbnail is clicked
+function changeMainImage(imageUrl) {
+  const mainImage = document.getElementById('main-product-image');
+  if (mainImage) {
+    mainImage.src = imageUrl;
+  }
+  
+  // Update active thumbnail
+  const thumbnails = document.querySelectorAll('.thumbnail-images .thumbnail');
+  thumbnails.forEach(thumb => {
+    thumb.classList.remove('active');
+    if (thumb.src === imageUrl) {
+      thumb.classList.add('active');
+    }
+  });
+}
+
+// Change product quantity in details page
+function changeProductQuantity(change) {
+  const quantityInput = document.getElementById('quantity');
+  if (quantityInput) {
+    let currentValue = parseInt(quantityInput.value);
+    let newValue = currentValue + change;
+    const maxValue = parseInt(quantityInput.max);
+    
+    if (newValue >= 1 && newValue <= maxValue) {
+      quantityInput.value = newValue;
+    }
+  }
+}
+
+// Add to cart from product details page
+function addToCartFromDetails(productId) {
+  const quantityInput = document.getElementById('quantity');
+  const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+  cart.addItem(productId, quantity);
+}
+
+// =============================================
 // Initialize on DOM Load
 // =============================================
 
@@ -769,9 +995,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize checkout page
   initCheckoutForm();
   updateCheckoutSummary();
+  initRegionListener();
   
   // Initialize contact page
   initContactForm();
+  
+  // Initialize product details page
+  await renderProductDetails();
   
   // Listen for cart updates
   window.addEventListener('cartUpdated', (event) => {
@@ -794,3 +1024,7 @@ window.generateWhatsAppMessage = generateWhatsAppMessage;
 window.fetchProducts = fetchProducts;
 window.fetchNewArrivals = fetchNewArrivals;
 window.fetchFastSelling = fetchFastSelling;
+window.fetchProductById = fetchProductById;
+window.updateCheckoutSummary = updateCheckoutSummary;
+window.initRegionListener = initRegionListener;
+window.renderProductDetails = renderProductDetails;
