@@ -319,9 +319,13 @@ async function openEditModal(productId) {
       document.getElementById('edit-product-form input[name="isFastSelling"]').checked = p.isFastSelling;
       
       document.getElementById('edit-modal').classList.remove('hidden');
+    } else {
+      console.error('API Error:', data.message);
+      showToast(data.message || 'Error loading product', 'error');
     }
   } catch (error) {
-    showToast('Error loading product', 'error');
+    console.error('Fetch Error:', error);
+    showToast('Error loading product: ' + error.message, 'error');
   }
 }
 
