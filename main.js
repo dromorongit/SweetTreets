@@ -535,14 +535,20 @@ function generateWhatsAppMessage(order, customer) {
     `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`
   ).join('%0A');
   
-  const message = `🏪 *Sweet Treets Order*%0A%0A` +
+  let message = `🏪 *Sweet Treets Order*%0A%0A` +
     `*Order ID:* ${order.orderId}%0A%0A` +
     `*Customer:* ${customer.name}%0A%0A` +
     `*Items:*%0A${itemsList}%0A%0A` +
     `*Total Amount:* ${formatPrice(order.total + 35.00)} (incl. delivery)%0A%0A` +
     `*Delivery Address:*%0A${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
-    `*Phone:* ${customer.phone}%0A%0A` +
-    `📝 Message: I have made payment and attached receipt on the website.`;
+    `*Phone:* ${customer.phone}%0A%0A`;
+  
+  // Add receipt URL if available
+  if (order.receiptUrl) {
+    message += `📄 *Payment Receipt:*%0A${order.receiptUrl}%0A%0A`;
+  }
+  
+  message += `📝 Message: I have made payment and attached receipt on the website.`;
   
   return message;
 }
@@ -560,6 +566,15 @@ function generateOrderId() {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `ST-${timestamp}-${random}`;
+}
+
+// Get receipt URL from checkout page
+function getReceiptUrl() {
+  const receiptUrlInput = document.getElementById('receipt-url');
+  if (receiptUrlInput) {
+    return receiptUrlInput.value || '';
+  }
+  return '';
 }
 
 // =============================================
@@ -606,11 +621,15 @@ async function initCheckoutForm() {
       return;
     }
     
+    // Get receipt URL from hidden input
+    const receiptUrl = getReceiptUrl();
+    
     // Process order
     const orderData = {
       orderId: generateOrderId(),
       items: cart.getItems(),
       total: cart.getTotal(),
+      receiptUrl: receiptUrl,
       customer: {
         name: form.querySelector('#fullName')?.value || '',
         email: form.querySelector('#email')?.value || '',
@@ -767,6 +786,7 @@ window.cart = cart;
 window.updateQuantity = updateQuantity;
 window.formatPrice = formatPrice;
 window.getFullImageUrl = getFullImageUrl;
+window.getReceiptUrl = getReceiptUrl;
 window.createProductCard = createProductCard;
 window.createCartItem = createCartItem;
 window.redirectToWhatsApp = redirectToWhatsApp;
