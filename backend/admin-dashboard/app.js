@@ -4,6 +4,24 @@
 
 const API_BASE = 'https://sweettreets-production.up.railway.app/api';
 
+// Helper function to get full image URL
+function getFullImageUrl(imagePath) {
+  if (!imagePath) return 'https://via.placeholder.com/60?text=No+Image';
+  
+  // If already a full URL (Cloudinary or other), return as is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // If it's a local path, prepend the Railway URL
+  if (imagePath.startsWith('/')) {
+    return `https://sweettreets-production.up.railway.app${imagePath}`;
+  }
+  
+  // Otherwise, prepend Railway URL
+  return `https://sweettreets-production.up.railway.app/${imagePath}`;
+}
+
 // State
 let token = localStorage.getItem('adminToken');
 let currentDeleteId = null;
@@ -234,7 +252,7 @@ async function loadProducts() {
     tbody.innerHTML = products.map(p => `
       <tr>
         <td>
-          <img src="${p.mainImage || 'https://via.placeholder.com/60'}" alt="${p.productName}" class="product-image">
+          <img src="${getFullImageUrl(p.mainImage)}" alt="${p.productName}" class="product-image">
         </td>
         <td>${p.productName}</td>
         <td>₵${p.originalPrice.toFixed(2)}</td>

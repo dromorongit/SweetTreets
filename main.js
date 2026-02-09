@@ -6,6 +6,24 @@
 // API Configuration
 const API_BASE = 'https://sweettreets-production.up.railway.app/api';
 
+// Helper function to get full image URL
+function getFullImageUrl(imagePath) {
+  if (!imagePath) return null;
+  
+  // If already a full URL (Cloudinary or other), return as is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // If it's a local path, prepend the Railway URL
+  if (imagePath.startsWith('/')) {
+    return `https://sweettreets-production.up.railway.app${imagePath}`;
+  }
+  
+  // Otherwise, prepend Railway URL
+  return `https://sweettreets-production.up.railway.app/${imagePath}`;
+}
+
 // Products cache
 let productsCache = [];
 
@@ -262,7 +280,7 @@ function createProductCard(product) {
   card.dataset.productId = product._id;
   card.dataset.categories = product.categories ? product.categories.join(',') : '';
   
-  const imageUrl = product.mainImage || 'https://via.placeholder.com/400x400?text=No+Image';
+  const imageUrl = getFullImageUrl(product.mainImage) || 'https://via.placeholder.com/400x400?text=No+Image';
   const price = product.salesPrice && product.salesPrice < product.originalPrice 
     ? `<span style="text-decoration: line-through; color: var(--color-text-light); font-size: 0.9rem;">${formatPrice(product.originalPrice)}</span> ${formatPrice(product.salesPrice)}`
     : formatPrice(product.originalPrice);
@@ -291,9 +309,11 @@ function createCartItem(item) {
   cartItem.className = 'cart-item';
   cartItem.dataset.productId = item.id;
   
+  const imageUrl = getFullImageUrl(item.image) || 'https://via.placeholder.com/100x100';
+  
   cartItem.innerHTML = `
     <div class="cart-item-image">
-      <img src="${item.image || 'https://via.placeholder.com/100x100'}" alt="${item.name}">
+      <img src="${imageUrl}" alt="${item.name}">
     </div>
     <div class="cart-item-details">
       <h4 class="cart-item-name">${item.name}</h4>
@@ -746,6 +766,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.cart = cart;
 window.updateQuantity = updateQuantity;
 window.formatPrice = formatPrice;
+window.getFullImageUrl = getFullImageUrl;
 window.createProductCard = createProductCard;
 window.createCartItem = createCartItem;
 window.redirectToWhatsApp = redirectToWhatsApp;

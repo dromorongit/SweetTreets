@@ -161,15 +161,21 @@ exports.createProduct = async (req, res) => {
     
     // Handle main image
     if (req.files && req.files.mainImage) {
+      console.log('Main image uploaded:', req.files.mainImage[0].path);
       productData.mainImage = req.files.mainImage[0].path; // Cloudinary URL
+    } else {
+      console.log('No main image uploaded');
     }
     
     // Handle additional images
     if (req.files && req.files.additionalImages) {
+      console.log('Additional images uploaded:', req.files.additionalImages.length);
       productData.additionalImages = req.files.additionalImages.map(
         file => file.path // Cloudinary URL
       );
     }
+    
+    console.log('Creating product with data:', productData);
     
     const product = await Product.create(productData);
     
@@ -179,6 +185,7 @@ exports.createProduct = async (req, res) => {
       data: product
     });
   } catch (error) {
+    console.error('Error creating product:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating product',
