@@ -334,6 +334,24 @@ async function openEditModal(productId) {
         fastSellingCheckbox.checked = p.isFastSelling;
       }
       
+      // Show current main image preview
+      const mainImageInput = document.getElementById('edit-mainImage');
+      const mainImageContainer = mainImageInput?.closest('.form-group');
+      if (mainImageContainer && p.mainImage) {
+        // Add current image preview
+        let preview = mainImageContainer.querySelector('.current-image-preview');
+        if (!preview) {
+          preview = document.createElement('div');
+          preview.className = 'current-image-preview';
+          preview.style.marginTop = '10px';
+          mainImageContainer.appendChild(preview);
+        }
+        preview.innerHTML = `
+          <p style="margin-bottom: 5px; font-size: 0.875rem;">Current Image:</p>
+          <img src="${p.mainImage}" alt="Current product image" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid var(--color-border);">
+        `;
+      }
+      
       document.getElementById('edit-modal').classList.remove('hidden');
     } else {
       console.error('API Error:', data.message);
