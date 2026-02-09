@@ -301,6 +301,14 @@ async function openEditModal(productId) {
     if (data.success) {
       const p = data.data;
       
+      // Populate form fields
+      const editForm = document.getElementById('edit-product-form');
+      if (!editForm) {
+        console.error('Edit form not found');
+        showToast('Error: Edit form not found', 'error');
+        return;
+      }
+      
       document.getElementById('edit-product-id').value = p._id;
       document.getElementById('edit-productName').value = p.productName;
       document.getElementById('edit-shortDescription').value = p.shortDescription;
@@ -309,14 +317,22 @@ async function openEditModal(productId) {
       document.getElementById('edit-salesPrice').value = p.salesPrice || '';
       document.getElementById('edit-stockNumber').value = p.stockNumber;
       
-      // Categories
-      document.querySelectorAll('#edit-product-form input[name="categories"]').forEach(cb => {
-        cb.checked = p.categories.includes(cb.value);
+      // Categories - use querySelectorAll to find checkboxes within the edit form
+      const categoryCheckboxes = editForm.querySelectorAll('input[name="categories"]');
+      categoryCheckboxes.forEach(cb => {
+        cb.checked = p.categories && p.categories.includes(cb.value);
       });
       
-      // Flags
-      document.getElementById('edit-product-form input[name="isNewArrival"]').checked = p.isNewArrival;
-      document.getElementById('edit-product-form input[name="isFastSelling"]').checked = p.isFastSelling;
+      // Flags - use querySelector to find checkboxes within the edit form
+      const newArrivalCheckbox = editForm.querySelector('input[name="isNewArrival"]');
+      const fastSellingCheckbox = editForm.querySelector('input[name="isFastSelling"]');
+      
+      if (newArrivalCheckbox) {
+        newArrivalCheckbox.checked = p.isNewArrival;
+      }
+      if (fastSellingCheckbox) {
+        fastSellingCheckbox.checked = p.isFastSelling;
+      }
       
       document.getElementById('edit-modal').classList.remove('hidden');
     } else {
