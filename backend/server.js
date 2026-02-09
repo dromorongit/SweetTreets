@@ -28,6 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Serve main frontend files (index, cart, checkout, etc.)
+const frontendPath = path.join(__dirname, '..');
+app.use(express.static(frontendPath));
+
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
@@ -75,8 +79,6 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📋 API Health: http://localhost:${PORT}/api/health`);
-    console.log(`🔐 Admin Login: http://localhost:${PORT}/api/admin/login`);
   });
 }
 
