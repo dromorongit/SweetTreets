@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 const authMiddleware = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload } = require('../config/cloudinary');
 
 // Public routes
 router.get('/', productController.getAllProducts);

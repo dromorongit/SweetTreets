@@ -161,13 +161,13 @@ exports.createProduct = async (req, res) => {
     
     // Handle main image
     if (req.files && req.files.mainImage) {
-      productData.mainImage = `/uploads/${req.files.mainImage[0].filename}`;
+      productData.mainImage = req.files.mainImage[0].path; // Cloudinary URL
     }
     
     // Handle additional images
     if (req.files && req.files.additionalImages) {
       productData.additionalImages = req.files.additionalImages.map(
-        file => `/uploads/${file.filename}`
+        file => file.path // Cloudinary URL
       );
     }
     
@@ -207,13 +207,13 @@ exports.updateProduct = async (req, res) => {
     
     // Handle main image update
     if (req.files && req.files.mainImage) {
-      updateData.mainImage = `/uploads/${req.files.mainImage[0].filename}`;
+      updateData.mainImage = req.files.mainImage[0].path; // Cloudinary URL
     }
     
     // Handle additional images update
     if (req.files && req.files.additionalImages) {
       const newImages = req.files.additionalImages.map(
-        file => `/uploads/${file.filename}`
+        file => file.path // Cloudinary URL
       );
       updateData.additionalImages = [...newImages];
     }
