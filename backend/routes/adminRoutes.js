@@ -12,6 +12,7 @@ const authMiddleware = require('../middleware/auth');
 router.post('/login', adminController.login);
 router.post('/register', adminController.register);
 router.post('/seed', adminController.seedAdmin);
+router.get('/seed', adminController.seedAdmin);
 
 // Protected routes
 router.get('/profile', authMiddleware, adminController.getProfile);
