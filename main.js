@@ -77,6 +77,21 @@ async function fetchNewArrivals() {
   }
 }
 
+// Fetch fast selling products
+async function fetchFastSelling() {
+  try {
+    const response = await fetch(`${API_BASE}/products/fast-selling`);
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching fast selling products:', error);
+    return [];
+  }
+}
+
 // Fetch a single product by ID
 async function fetchProductById(productId) {
   try {
