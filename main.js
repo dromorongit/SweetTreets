@@ -594,85 +594,12 @@ async function initCheckoutForm() {
   const form = document.getElementById('checkout-form');
   if (!form) return;
   
+  // Handle form submission (for non-Paystack fallback)
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     
-    // Validate form
-    const requiredFields = form.querySelectorAll('[required]');
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-      if (!field.value.trim()) {
-        isValid = false;
-        field.style.borderColor = 'var(--color-error)';
-      } else {
-        field.style.borderColor = 'var(--color-border)';
-      }
-    });
-    
-    if (!isValid) {
-      cart.showNotification('Please fill in all required fields');
-      return;
-    }
-    
-    // Check payment method and receipt
-    const paymentMethod = form.querySelector('input[name="paymentMethod"]:checked').value;
-    const receiptInput = form.querySelector('#receipt');
-    const paymentConfirmation = form.querySelector('#paymentConfirmation');
-    
-    if (paymentMethod !== 'cod' && (!receiptInput.files || receiptInput.files.length === 0)) {
-      cart.showNotification('Please upload your payment receipt');
-      return;
-    }
-    
-    if (paymentMethod !== 'cod' && (!paymentConfirmation || !paymentConfirmation.checked)) {
-      cart.showNotification('Please confirm that you have made the payment');
-      return;
-    }
-    
-    // Get receipt URL from hidden input
-    const receiptUrl = getReceiptUrl();
-    
-    // Process order
-    const orderData = {
-      orderId: generateOrderId(),
-      items: cart.getItems(),
-      total: cart.getTotal(),
-      receiptUrl: receiptUrl,
-      customer: {
-        name: form.querySelector('#fullName')?.value || '',
-        email: form.querySelector('#email')?.value || '',
-        phone: form.querySelector('#phone')?.value || '',
-        address: form.querySelector('#address')?.value || '',
-        city: form.querySelector('#city')?.value || '',
-        region: form.querySelector('#region')?.value || '',
-        landmark: form.querySelector('#landmark')?.value || '',
-        deliveryNotes: form.querySelector('#deliveryNotes')?.value || ''
-      },
-      paymentMethod: paymentMethod,
-      notes: form.querySelector('#orderNotes')?.value || '',
-      date: new Date().toISOString()
-    };
-    
-    console.log('Order placed:', orderData);
-    
-    // Deduct stock for each item
-    for (const item of orderData.items) {
-      await deductStock(item.id, item.quantity);
-    }
-    
-    // Clear cart and show success
-    cart.clearCart();
-    cart.showNotification('Order submitted! Redirecting to WhatsApp...');
-    
-    // Redirect to WhatsApp after 1.5 seconds
-    setTimeout(() => {
-      redirectToWhatsApp(orderData, orderData.customer);
-      // Redirect to home after WhatsApp
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 3000);
-    }, 1500);
+    // For Paystack payment, we don't use form submission
+    // Payment is initiated via the Paystack button
   });
 }
 

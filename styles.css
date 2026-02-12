@@ -996,6 +996,17 @@ h6 { font-size: var(--font-size-base); }
   color: rgba(255, 255, 255, 0.5);
 }
 
+.footer-bottom p {
+  margin-bottom: var(--spacing-xs);
+}
+
+.developer-credit {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
 /* =============================================
    About Page
    ============================================= */

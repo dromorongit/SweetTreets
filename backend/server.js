@@ -13,6 +13,7 @@ const connectDB = require('./config/database');
 // Import routes
 const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Initialize app
 const app = express();
@@ -35,6 +36,7 @@ app.use(express.static(frontendPath));
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint (Railway expects this)
 app.get('/api/health', (req, res) => {

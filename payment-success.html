@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Payment Success - Sweet Treets">
+  <title>Payment Successful - Sweet Treets</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/images/Sweettreetsicon.PNG" type="image/png">
+  <style>
+    .payment-success-container {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--spacing-xl);
+    }
+    
+    .payment-success-content {
+      max-width: 500px;
+      padding: var(--spacing-xl);
+    }
+    
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: var(--spacing-lg);
+      animation: bounceIn 0.6s ease;
+    }
+    
+    .success-title {
+      font-size: 2rem;
+      color: var(--color-success);
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .success-message {
+      color: var(--color-text-light);
+      margin-bottom: var(--spacing-lg);
+      line-height: 1.6;
+    }
+    
+    .order-details {
+      background: var(--color-background-alt);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      text-align: left;
+    }
+    
+    .order-details h3 {
+      margin-bottom: var(--spacing-md);
+      font-size: 1.1rem;
+    }
+    
+    .order-details p {
+      margin-bottom: var(--spacing-sm);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .order-details strong {
+      color: var(--color-text);
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .spinner {
+      border: 4px solid var(--color-border);
+      border-top: 4px solid var(--color-accent);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto var(--spacing-lg);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-main">
+        <a href="index.html" class="logo">
+          <img src="assets/images/Sweettreetslogo.PNG" alt="Sweet Treets Logo">
+          <span class="logo-text">Sweet Treets</span>
+        </a>
+        
+        <nav class="nav-menu">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+        
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Payment Success Section -->
+  <section class="payment-success-container">
+    <div class="payment-success-content" id="payment-content">
+      <div class="spinner" id="loading-spinner"></div>
+      <div class="success-icon" id="success-icon" style="display: none;">✅</div>
+      <h1 class="success-title" id="success-title" style="display: none;">Payment Successful!</h1>
+      <p class="success-message" id="success-message">Your payment is being processed...</p>
+      
+      <div class="order-details" id="order-details" style="display: none;">
+        <h3>Order Details</h3>
+        <p><span>Order ID:</span> <strong id="order-id">-</strong></p>
+        <p><span>Amount Paid:</span> <strong id="amount-paid">-</strong></p>
+        <p><span>Transaction Ref:</span> <strong id="transaction-ref">-</strong></p>
+      </div>
+      
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+        <a href="shop.html" class="btn btn-outline">Browse Products</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 Sweet Treets. All Rights Reserved.</p>
+        <p class="developer-credit">Developed by Dromor Narh</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Payment verification and success page logic
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const reference = urlParams.get('reference');
+      const trxref = urlParams.get('trxref');
+      const paymentRef = reference || trxref;
+      
+      if (paymentRef) {
+        await verifyPayment(paymentRef);
+      } else {
+        showError('Payment reference not found. Please contact support.');
+      }
+    });
+
+    async function verifyPayment(reference) {
+      try {
+        const API_BASE = 'https://sweettreets-production.up.railway.app/api';
+        
+        const response = await fetch(`${API_BASE}/payments/verify/${reference}`);
+        const data = await response.json();
+        
+        if (data.success && data.data.verified) {
+          showSuccess(data.data);
+        } else {
+          showError('Payment verification failed. Please contact support.');
+        }
+      } catch (error) {
+        console.error('Error verifying payment:', error);
+        // If verification fails, show pending state
+        showPending();
+      }
+    }
+
+    function showSuccess(paymentData) {
+      document.getElementById('loading-spinner').style.display = 'none';
+      document.getElementById('success-icon').style.display = 'block';
+      document.getElementById('success-title').style.display = 'block';
+      document.getElementById('success-title').textContent = 'Payment Successful!';
+      document.getElementById('success-message').textContent = 
+        'Thank you for your order! Your payment has been received and your order is being processed.';
+      
+      if (paymentData.metadata) {
+        document.getElementById('order-details').style.display = 'block';
+        document.getElementById('order-id').textContent = paymentData.metadata.orderId || '-';
+      }
+      
+      document.getElementById('amount-paid').textContent = `₵${paymentData.amount.toFixed(2)}`;
+      document.getElementById('transaction-ref').textContent = paymentData.reference;
+    }
+
+    function showPending() {
+      document.getElementById('loading-spinner').style.display = 'none';
+      document.getElementById('success-icon').style.display = 'block';
+      document.getElementById('success-icon').textContent = '⏳';
+      document.getElementById('success-title').style.display = 'block';
+      document.getElementById('success-title').textContent = 'Payment Pending';
+      document.getElementById('success-title').style.color = 'var(--color-warning)';
+      document.getElementById('success-message').textContent = 
+        'Your payment is being processed. Please wait a moment and refresh the page, or contact support if this persists.';
+    }
+
+    function showError(message) {
+      document.getElementById('loading-spinner').style.display = 'none';
+      document.getElementById('success-icon').style.display = 'block';
+      document.getElementById('success-icon').textContent = '❌';
+      document.getElementById('success-title').style.display = 'block';
+      document.getElementById('success-title').textContent = 'Payment Issue';
+      document.getElementById('success-title').style.color = 'var(--color-error)';
+      document.getElementById('success-message').textContent = message;
+    }
+  </script>
+</body>
+</html>

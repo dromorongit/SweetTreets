@@ -143,41 +143,37 @@
               
               <!-- Payment Details Box -->
               <div class="payment-details-box">
-                <h4>📱 Payment Details</h4>
-                <p><strong>Mobile Money to:</strong></p>
-                <p class="payment-number">+233 54 042 1116 (Alice Malm)</p>
+                <h4>💳 Pay with Paystack</h4>
+                <p>Secure payment via Credit/Debit Card, Mobile Money, or Bank Transfer</p>
                 <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-top: var(--spacing-sm);">
-                  After payment, please upload your receipt below.
+                  Click "Pay Now" to complete your secure payment.
                 </p>
               </div>
               
               <div class="form-group">
-                <label class="form-label">Select Payment Method *</label>
+                <label class="form-label">Payment Method *</label>
                 <div style="display: flex; flex-direction: column; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
                   <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-accent); border-radius: var(--radius-md); cursor: pointer; background: var(--color-background);">
-                    <input type="radio" name="paymentMethod" value="momo" checked style="width: 20px; height: 20px;">
+                    <input type="radio" name="paymentMethod" value="paystack" checked style="width: 20px; height: 20px;">
                     <div>
-                      <strong>Mobile Money</strong>
-                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">MTN, AirtelTigo, or Vodafone</p>
+                      <strong>Paystack (Card/Mobile Money/Bank)</strong>
+                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Visa, Mastercard, MTN, AirtelTigo, Vodafone</p>
                     </div>
                   </label>
                 </div>
               </div>
               
-              <!-- Receipt Upload -->
-              <div class="form-group" id="receipt-upload-group">
-                <label for="receipt" class="form-label">Upload Payment Receipt *</label>
-                <div class="file-upload-wrapper">
-                  <input type="file" id="receipt" name="receipt" class="file-upload-input" accept="image/*,.heic,.heif" onchange="handleReceiptUpload(this)">
-                  <div class="file-upload-content" id="file-upload-content">
-                    <div class="file-upload-icon">📄</div>
-                    <p>Click or drag to upload receipt</p>
-                    <p style="font-size: var(--font-size-sm); color: var(--color-text-light);">PNG, JPG, HEIC up to 5MB</p>
-                  </div>
-                  <img id="receipt-preview" class="receipt-preview-img" style="display: none;">
-                </div>
-                <input type="hidden" id="receipt-url" name="receiptUrl">
+              <!-- Paystack Payment Button -->
+              <div class="form-group" id="paystack-payment-section">
+                <button type="button" id="paystack-pay-btn" class="btn btn-primary paystack-btn" onclick="initiatePaystackPayment()" style="width: 100%; padding: var(--spacing-md); font-size: 1.1rem;">
+                  <span id="paystack-btn-text">Pay Now with Paystack</span>
+                  <span id="paystack-btn-loader" style="display: none;">⏳ Processing...</span>
+                </button>
+                <p id="paystack-status" style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-top: var(--spacing-sm); text-align: center;"></p>
               </div>
+              
+              <!-- Hidden field for payment reference -->
+              <input type="hidden" id="payment-reference" name="paymentReference">
             </div>
             
             <!-- Delivery Fee Notice -->
@@ -208,7 +204,7 @@
                 <label class="checkbox-label">
                   <input type="checkbox" id="paymentConfirmation">
                   <span class="checkbox-custom"></span>
-                  <span>I confirm that I have made the payment to +233 54 042 1116 (Alice Malm) *</span>
+                  <span>I confirm that I want to complete this payment securely via Paystack *</span>
                 </label>
               </div>
             </div>
@@ -361,21 +357,194 @@
       <!-- Footer Bottom -->
       <div class="footer-bottom">
         <p>© 2026 Sweet Treets. All Rights Reserved.</p>
+        <p class="developer-credit">Developed by Dromor Narh</p>
       </div>
     </div>
   </footer>
 
+  <!-- Paystack Payment SDK -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  
   <!-- JavaScript -->
   <script src="main.js"></script>
   <script>
+    // Paystack public key
+    const PAYSTACK_PUBLIC_KEY = 'pk_live_a6eec5b82957882833117341d7cb42a996b8630e';
+    
     // Checkout page specific initialization
     document.addEventListener('DOMContentLoaded', () => {
       renderCheckoutItems();
       updateCheckoutSummary();
       initRegionListener();
+      initCheckoutForm();
     });
 
-    // Handle receipt upload to Cloudinary
+    // Generate unique payment reference
+    function generatePaymentReference() {
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+      return `ST_PAY_${timestamp}_${random}`;
+    }
+
+    // Calculate total with delivery
+    function calculateTotalWithDelivery() {
+      const subtotal = cart.getTotal();
+      const regionSelect = document.getElementById('region');
+      const selectedRegion = regionSelect ? regionSelect.value : '';
+      const isGreaterAccra = selectedRegion === 'greater-accra';
+      const deliveryFee = isGreaterAccra ? 35.00 : 0;
+      return subtotal + deliveryFee;
+    }
+
+    // Initiate Paystack payment
+    async function initiatePaystackPayment() {
+      const form = document.getElementById('checkout-form');
+      const btn = document.getElementById('paystack-pay-btn');
+      const btnText = document.getElementById('paystack-btn-text');
+      const btnLoader = document.getElementById('paystack-btn-loader');
+      const status = document.getElementById('paystack-status');
+      
+      // Validate form
+      const requiredFields = form.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = 'var(--color-error)';
+        } else {
+          field.style.borderColor = 'var(--color-border)';
+        }
+      });
+      
+      if (!isValid) {
+        cart.showNotification('Please fill in all required fields');
+        return;
+      }
+      
+      // Get customer info
+      const customerName = form.querySelector('#fullName')?.value || '';
+      const email = form.querySelector('#email')?.value || '';
+      const phone = form.querySelector('#phone')?.value || '';
+      
+      if (!email) {
+        cart.showNotification('Please enter your email address');
+        return;
+      }
+      
+      // Show loading state
+      btn.disabled = true;
+      btnText.style.display = 'none';
+      btnLoader.style.display = 'inline';
+      status.textContent = 'Initializing payment...';
+      status.style.color = 'var(--color-text-light)';
+      
+      try {
+        // Calculate total
+        const totalAmount = calculateTotalWithDelivery();
+        const paymentReference = generatePaymentReference();
+        
+        // Prepare delivery info
+        const deliveryInfo = {
+          address: form.querySelector('#address')?.value || '',
+          city: form.querySelector('#city')?.value || '',
+          region: form.querySelector('#region')?.value || '',
+          landmark: form.querySelector('#landmark')?.value || '',
+          deliveryNotes: form.querySelector('#deliveryNotes')?.value || ''
+        };
+        
+        // Initialize payment with backend
+        const API_BASE = 'https://sweettreets-production.up.railway.app/api';
+        const response = await fetch(`${API_BASE}/payments/initialize`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            amount: totalAmount,
+            currency: 'GHS',
+            reference: paymentReference,
+            customerName,
+            items: cart.getItems(),
+            deliveryInfo
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store payment reference
+          document.getElementById('payment-reference').value = paymentReference;
+          status.textContent = 'Payment initialized. Redirecting to payment page...';
+          
+          // Open Paystack payment modal
+          if (data.data.authorizationUrl) {
+            // Redirect to Paystack payment page
+            window.location.href = data.data.authorizationUrl;
+          } else {
+            // Fallback to inline payment
+            payWithPaystack(email, totalAmount, paymentReference, customerName, phone);
+          }
+        } else {
+          throw new Error(data.message || 'Failed to initialize payment');
+        }
+      } catch (error) {
+        console.error('Payment initialization error:', error);
+        status.textContent = 'Failed to initialize payment. Please try again.';
+        status.style.color = 'var(--color-error)';
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+        cart.showNotification('Failed to initialize payment: ' + error.message);
+      }
+    }
+
+    // Pay with Paystack inline
+    function payWithPaystack(email, amount, reference, customerName, phone) {
+      const handler = PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: email,
+        amount: Math.round(amount * 100), // Convert to kobo
+        currency: 'GHS',
+        ref: reference,
+        metadata: {
+          customer_name: customerName,
+          phone: phone,
+          order_items: cart.getItems().map(item => `${item.name} x${item.quantity}`).join(', ')
+        },
+        callback: function(response) {
+          // Payment successful
+          console.log('Payment successful:', response);
+          document.getElementById('payment-reference').value = response.reference;
+          
+          // Show success and redirect
+          cart.showNotification('Payment successful! Order being processed...');
+          
+          // Redirect to success page
+          setTimeout(() => {
+            window.location.href = `payment-success.html?reference=${response.reference}`;
+          }, 1500);
+        },
+        onClose: function() {
+          // Payment modal closed
+          const btn = document.getElementById('paystack-pay-btn');
+          const btnText = document.getElementById('paystack-btn-text');
+          const btnLoader = document.getElementById('paystack-btn-loader');
+          const status = document.getElementById('paystack-status');
+          
+          btn.disabled = false;
+          btnText.style.display = 'inline';
+          btnLoader.style.display = 'none';
+          status.textContent = 'Payment modal closed. Click "Pay Now" to try again.';
+          status.style.color = 'var(--color-text-light)';
+        }
+      });
+      
+      handler.openIframe();
+    }
+
+    // Handle receipt upload to Cloudinary (kept for backward compatibility)
     async function handleReceiptUpload(input) {
       const preview = document.getElementById('receipt-preview');
       const content = document.getElementById('file-upload-content');
