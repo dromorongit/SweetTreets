@@ -304,20 +304,37 @@ async function loadDashboardData() {
   }
 }
 
-// Load products
+// Load products (admin - shows all products without pagination)
 async function loadProducts() {
   const search = document.getElementById('search-products').value;
   const category = document.getElementById('filter-category').value;
   
-  let url = `${API_BASE}/products?`;
-  if (search) url += `search=${encodeURIComponent(search)}&`;
-  if (category) url += `category=${encodeURIComponent(category)}`;
+  // Use the admin endpoint that returns all products without pagination
+  let url = `${API_BASE}/products/all`;
   
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
-    const products = data.data || [];
+    let products = data.data || [];
+    
+    // Apply client-side filtering (since admin endpoint returns all products)
+    if (search) {
+      const searchLower = search.toLowerCase();
+      products = products.filter(p => 
+        p.productName.toLowerCase().includes(searchLower) ||
+        p.shortDescription.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    if (category) {
+      products = products.filter(p => p.categories && p.categories.includes(category));
+    }
+    
     const tbody = document.getElementById('products-table');
     
     if (products.length === 0) {

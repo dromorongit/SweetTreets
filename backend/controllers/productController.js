@@ -79,10 +79,11 @@ exports.getProductsByCategory = async (req, res) => {
 // Get new arrivals
 exports.getNewArrivals = async (req, res) => {
   try {
+    // Remove pagination limit to show all new arrivals
     const products = await Product.find({
       isNewArrival: true,
       isActive: true
-    }).sort({ createdAt: -1 }).limit(10);
+    }).sort({ createdAt: -1 });
     
     res.json({
       success: true,
@@ -100,6 +101,7 @@ exports.getNewArrivals = async (req, res) => {
 // Get fast selling products
 exports.getFastSelling = async (req, res) => {
   try {
+    // Remove pagination limit to show all fast selling products
     const products = await Product.find({
       isFastSelling: true,
       isActive: true
