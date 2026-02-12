@@ -29,6 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Serve backend assets (logo, favicon, etc.)
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
 // Serve main frontend files (index, cart, checkout, etc.)
 const frontendPath = path.join(__dirname, '..');
 app.use(express.static(frontendPath));
