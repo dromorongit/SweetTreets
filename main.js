@@ -408,7 +408,7 @@ function updateCartSummary() {
   }
   
   if (totalElement) {
-    const deliveryFee = 35.00;
+    const deliveryFee = 0;
     const totalWithDelivery = cart.getTotal() + deliveryFee;
     totalElement.textContent = formatPrice(totalWithDelivery);
   }
@@ -553,10 +553,9 @@ function generateWhatsAppMessage(order, customer) {
     `• ${item.name} x${item.quantity} - ${formatPrice(item.price * item.quantity)}`
   ).join('%0A');
   
-  // Calculate delivery fee based on region
-  const isGreaterAccra = customer.region === 'greater-accra';
-  const deliveryFee = isGreaterAccra ? 35.00 : 0;
-  const deliveryText = isGreaterAccra ? '₵35.00' : 'To be discussed';
+  // Delivery fee is now "to be discussed" for all locations
+  const deliveryFee = 0;
+  const deliveryText = 'To be discussed';
   
   let message = `🏪 *Sweet Treets Order*%0A%0A` +
     `*Order ID:* ${order.orderId}%0A%0A` +
@@ -628,16 +627,9 @@ function updateCheckoutSummary() {
   const regionSelect = document.getElementById('region');
   const selectedRegion = regionSelect ? regionSelect.value : '';
   
-  // Check if Greater Accra is selected
-  const isGreaterAccra = selectedRegion === 'greater-accra';
-  
+  // Delivery fee is now "to be discussed" for all locations
   let deliveryFee = 0;
   let deliveryText = 'To be discussed';
-  
-  if (isGreaterAccra) {
-    deliveryFee = 35.00;
-    deliveryText = '₵35.00';
-  }
   
   const total = subtotal + deliveryFee;
   
@@ -647,14 +639,8 @@ function updateCheckoutSummary() {
   
   if (deliveryElement) {
     deliveryElement.textContent = deliveryText;
-    // Add styling for "to be discussed" message
-    if (!isGreaterAccra) {
-      deliveryElement.style.color = 'var(--color-text-light)';
-      deliveryElement.style.fontSize = 'var(--font-size-sm)';
-    } else {
-      deliveryElement.style.color = '';
-      deliveryElement.style.fontSize = '';
-    }
+    deliveryElement.style.color = 'var(--color-text-light)';
+    deliveryElement.style.fontSize = 'var(--font-size-sm)';
   }
   
   if (totalElement) {
