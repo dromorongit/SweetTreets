@@ -582,19 +582,14 @@ function generateWhatsAppMessage(order, customer) {
   
   let message = `🏪 *Sweet Treets Order*%0A%0A` +
     `*Order ID:* ${order.orderId}%0A%0A` +
-    `*Customer:* ${customer.name}%0A%0A` +
-    `*Items:*%0A${itemsList}%0A%0A` +
-    `*Delivery Fee:* ${deliveryText}%0A%0A` +
+    `*Customer:* ${customer.name}%0A` +
+    `*Phone:* ${customer.phone}%0A` +
+    `*Delivery Address:* ${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
+    `*Items Ordered:*%0A${itemsList}%0A%0A` +
+    `*Subtotal:* ${formatPrice(order.total)}%0A` +
+    `*Delivery Fee:* ${deliveryText}%0A` +
     `*Total Amount:* ${formatPrice(order.total + deliveryFee)}%0A%0A` +
-    `*Delivery Address:*%0A${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
-    `*Phone:* ${customer.phone}%0A%0A`;
-  
-  // Add receipt URL if available
-  if (order.receiptUrl) {
-    message += `📄 *Payment Receipt:*%0A${order.receiptUrl}%0A%0A`;
-  }
-  
-  message += `📝 Message: I have made payment and attached receipt on the website.`;
+    `*Payment Status:* Paid via Paystack`;
   
   return message;
 }
@@ -655,8 +650,7 @@ async function initCheckoutForm() {
     const order = {
       orderId: generateOrderId(),
       items: cart.getItems(),
-      total: cart.getTotal(),
-      receiptUrl: ''
+      total: cart.getTotal()
     };
     
     // Redirect to WhatsApp
