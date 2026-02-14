@@ -159,6 +159,11 @@ class Cart {
     const product = productsCache.find(p => p._id === productId);
     if (!product) return false;
 
+    // Use salesPrice if available, otherwise use originalPrice
+    const price = product.salesPrice && product.salesPrice < product.originalPrice 
+      ? product.salesPrice 
+      : product.originalPrice;
+
     const existingItem = this.items.find(item => item.id === productId);
     
     if (existingItem) {
@@ -167,7 +172,7 @@ class Cart {
       this.items.push({
         id: product._id,
         name: product.productName,
-        price: product.originalPrice,
+        price: price,
         image: product.mainImage,
         quantity: quantity,
         stockNumber: product.stockNumber
