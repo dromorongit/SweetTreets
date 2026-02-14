@@ -183,10 +183,8 @@
               <div class="delivery-fee-notice">
                 <p>📦 <strong>Delivery Fees:</strong></p>
                 <ul>
-                  <li>Within Accra: ₵35.00</li>
-                  <li>Outside Accra: Fees will be communicated after checkout</li>
+                  <li>Delivery fees will be communicated after checkout</li>
                 </ul>
-                <p style="font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">*Orders paid before 2:00 PM qualify for next-day delivery</p>
               </div>
             </div>
             
@@ -243,7 +241,7 @@
             
             <div class="summary-row total">
               <span>Total</span>
-              <span id="checkout-total">₵35.00</span>
+              <span id="checkout-total">₵0.00</span>
             </div>
           </div>
           
@@ -389,10 +387,8 @@
     // Calculate total with delivery
     function calculateTotalWithDelivery() {
       const subtotal = cart.getTotal();
-      const regionSelect = document.getElementById('region');
-      const selectedRegion = regionSelect ? regionSelect.value : '';
-      const isGreaterAccra = selectedRegion === 'greater-accra';
-      const deliveryFee = isGreaterAccra ? 35.00 : 0;
+      // Delivery fee is now "to be discussed" for all locations
+      const deliveryFee = 0;
       return subtotal + deliveryFee;
     }
 
