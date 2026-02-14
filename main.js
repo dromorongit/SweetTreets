@@ -53,6 +53,12 @@ async function fetchProductsByCategory(category) {
     const response = await fetch(`${API_BASE}/products/category/${category}`);
     const data = await response.json();
     if (data.success) {
+      // Add category products to cache
+      data.data.forEach(product => {
+        if (!productsCache.find(p => p._id === product._id)) {
+          productsCache.push(product);
+        }
+      });
       return data.data;
     }
     return [];
@@ -68,6 +74,12 @@ async function fetchNewArrivals() {
     const response = await fetch(`${API_BASE}/products/new-arrivals`);
     const data = await response.json();
     if (data.success) {
+      // Add new arrival products to cache
+      data.data.forEach(product => {
+        if (!productsCache.find(p => p._id === product._id)) {
+          productsCache.push(product);
+        }
+      });
       return data.data;
     }
     return [];
@@ -83,6 +95,12 @@ async function fetchFastSelling() {
     const response = await fetch(`${API_BASE}/products/fast-selling`);
     const data = await response.json();
     if (data.success) {
+      // Add fast selling products to cache
+      data.data.forEach(product => {
+        if (!productsCache.find(p => p._id === product._id)) {
+          productsCache.push(product);
+        }
+      });
       return data.data;
     }
     return [];
