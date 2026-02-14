@@ -64,6 +64,22 @@ function setupEventListeners() {
   // Logout
   logoutBtn.addEventListener('click', handleLogout);
   
+  // Mobile navigation toggle
+  const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (mobileNavToggle && sidebar) {
+    mobileNavToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !mobileNavToggle.contains(e.target)) {
+        sidebar.classList.remove('active');
+      }
+    });
+  }
+  
   // Navigation
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -187,6 +203,12 @@ function showDashboard() {
 
 // Navigate to page
 function navigateTo(page) {
+  // Close mobile sidebar
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.remove('active');
+  }
+  
   // Update nav
   navItems.forEach(item => {
     item.classList.toggle('active', item.dataset.page === page);
