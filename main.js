@@ -631,12 +631,42 @@ async function initCheckoutForm() {
   const form = document.getElementById('checkout-form');
   if (!form) return;
   
-  // Handle form submission (for non-Paystack fallback)
+  // Handle form submission - redirect to WhatsApp with order
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     
-    // For Paystack payment, we don't use form submission
-    // Payment is initiated via the Paystack button
+    // Get customer info
+    const customer = {
+      name: form.querySelector('#fullName')?.value || '',
+      email: form.querySelector('#email')?.value || '',
+      phone: form.querySelector('#phone')?.value || '',
+      address: form.querySelector('#address')?.value || '',
+      city: form.querySelector('#city')?.value || '',
+      region: form.querySelector('#region')?.value || ''
+    };
+    
+    // Validate
+    if (!customer.name || !customer.phone || !customer.address || !customer.city || !customer.region) {
+      cart.showNotification('Please fill in all delivery information');
+      return;
+    }
+    
+    // Create order
+    const order = {
+      orderId: generateOrderId(),
+      items: cart.getItems(),
+      total: cart.getTotal(),
+      receiptUrl: ''
+    };
+    
+    // Redirect to WhatsApp
+    redirectToWhatsApp(order, customer);
+    
+    // Clear cart after order
+    cart.clearCart();
+    
+    // Show success
+    cart.showNotification('Order sent to WhatsApp! Check your messages.');
   });
 }
 
@@ -972,6 +1002,7 @@ window.createProductCard = createProductCard;
 window.createCartItem = createCartItem;
 window.redirectToWhatsApp = redirectToWhatsApp;
 window.generateWhatsAppMessage = generateWhatsAppMessage;
+window.generateOrderId = generateOrderId;
 window.fetchProducts = fetchProducts;
 window.fetchNewArrivals = fetchNewArrivals;
 window.fetchFastSelling = fetchFastSelling;
