@@ -146,30 +146,8 @@
                 <h4>💳 Pay with Paystack</h4>
                 <p>Secure payment via Credit/Debit Card, Mobile Money, or Bank Transfer</p>
                 <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-top: var(--spacing-sm);">
-                  Click "Pay Now" to complete your secure payment.
+                  Click "Complete Order" below to proceed with payment.
                 </p>
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Payment Method *</label>
-                <div style="display: flex; flex-direction: column; gap: var(--spacing-md); margin-top: var(--spacing-sm);">
-                  <label style="display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); border: 2px solid var(--color-accent); border-radius: var(--radius-md); cursor: pointer; background: var(--color-background);">
-                    <input type="radio" name="paymentMethod" value="paystack" checked style="width: 20px; height: 20px;">
-                    <div>
-                      <strong>Paystack (Card/Mobile Money/Bank)</strong>
-                      <p style="font-size: var(--font-size-sm); color: var(--color-text-light); margin: 0;">Visa, Mastercard, MTN, AirtelTigo, Vodafone</p>
-                    </div>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Paystack Payment Button -->
-              <div class="form-group" id="paystack-payment-section">
-                <button type="button" id="paystack-pay-btn" class="btn btn-primary paystack-btn" onclick="initiatePaystackPayment()" style="width: 100%; padding: var(--spacing-md); font-size: 1.1rem;">
-                  <span id="paystack-btn-text">Pay Now with Paystack</span>
-                  <span id="paystack-btn-loader" style="display: none;">⏳ Processing...</span>
-                </button>
-                <p id="paystack-status" style="font-size: var(--font-size-sm); color: var(--color-text-light); margin-top: var(--spacing-sm); text-align: center;"></p>
               </div>
               
               <!-- Hidden field for payment reference -->
@@ -197,12 +175,6 @@
                   <input type="checkbox" id="policyAgreement" required>
                   <span class="checkbox-custom"></span>
                   <span>I agree to the <a href="policy.html" target="_blank">Terms & Policies</a> *</span>
-                </label>
-                
-                <label class="checkbox-label">
-                  <input type="checkbox" id="paymentConfirmation">
-                  <span class="checkbox-custom"></span>
-                  <span>I confirm that I want to complete this payment securely via Paystack *</span>
                 </label>
               </div>
             </div>
@@ -246,7 +218,7 @@
           </div>
           
           <!-- Place Order Button -->
-          <button type="submit" form="checkout-form" class="btn btn-primary checkout-btn" style="width: 100%;">
+          <button type="button" id="complete-order-btn" class="btn btn-primary checkout-btn" onclick="handleCompleteOrder()" style="width: 100%;">
             Complete Order
           </button>
           
@@ -497,7 +469,7 @@
     }
 
     // Pay with Paystack inline
-    function payWithPaystack(email, amount, reference, customerName, phone) {
+    function payWithPaystack(email, amount, reference, customerName, phone, customer, deliveryInfo) {
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: email,
@@ -514,30 +486,133 @@
           console.log('Payment successful:', response);
           document.getElementById('payment-reference').value = response.reference;
           
-          // Show success and redirect
-          cart.showNotification('Payment successful! Order being processed...');
+          // Show success notification
+          cart.showNotification('Payment successful! Sending order to WhatsApp...');
           
-          // Redirect to success page
-          setTimeout(() => {
-            window.location.href = `payment-success.html?reference=${response.reference}`;
-          }, 1500);
+          // Create order and send to WhatsApp
+          const order = {
+            orderId: generateOrderId(),
+            items: cart.getItems(),
+            total: cart.getTotal()
+          };
+          
+          // Redirect to WhatsApp
+          redirectToWhatsApp(order, customer);
+          
+          // Clear cart after order
+          cart.clearCart();
         },
         onClose: function() {
           // Payment modal closed
-          const btn = document.getElementById('paystack-pay-btn');
-          const btnText = document.getElementById('paystack-btn-text');
-          const btnLoader = document.getElementById('paystack-btn-loader');
-          const status = document.getElementById('paystack-status');
-          
-          btn.disabled = false;
-          btnText.style.display = 'inline';
-          btnLoader.style.display = 'none';
-          status.textContent = 'Payment modal closed. Click "Pay Now" to try again.';
-          status.style.color = 'var(--color-text-light)';
+          const btn = document.getElementById('complete-order-btn');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Complete Order';
+          }
+          cart.showNotification('Payment was not completed. Please try again.');
         }
       });
       
       handler.openIframe();
+    }
+
+    // Handle Complete Order button click
+    async function handleCompleteOrder() {
+      const form = document.getElementById('checkout-form');
+      const btn = document.getElementById('complete-order-btn');
+      
+      // Validate form
+      const requiredFields = form.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = 'var(--color-error)';
+        } else {
+          field.style.borderColor = 'var(--color-border)';
+        }
+      });
+      
+      if (!isValid) {
+        cart.showNotification('Please fill in all required fields');
+        return;
+      }
+      
+      // Get customer info
+      const customer = {
+        name: form.querySelector('#fullName')?.value || '',
+        email: form.querySelector('#email')?.value || '',
+        phone: form.querySelector('#phone')?.value || '',
+        address: form.querySelector('#address')?.value || '',
+        city: form.querySelector('#city')?.value || '',
+        region: form.querySelector('#region')?.value || ''
+      };
+      
+      if (!customer.email) {
+        cart.showNotification('Please enter your email address');
+        return;
+      }
+      
+      // Show loading state
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Processing Payment...';
+      
+      try {
+        // Calculate total
+        const totalAmount = calculateTotalWithDelivery();
+        const paymentReference = generatePaymentReference();
+        
+        // Prepare delivery info
+        const deliveryInfo = {
+          address: customer.address,
+          city: customer.city,
+          region: customer.region,
+          landmark: form.querySelector('#landmark')?.value || '',
+          deliveryNotes: form.querySelector('#deliveryNotes')?.value || ''
+        };
+        
+        // Initialize payment with backend
+        const API_BASE = 'https://sweettreets-production.up.railway.app/api';
+        const response = await fetch(`${API_BASE}/payments/initialize`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: customer.email,
+            amount: totalAmount,
+            currency: 'GHS',
+            reference: paymentReference,
+            customerName: customer.name,
+            items: cart.getItems(),
+            deliveryInfo
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store payment reference
+          document.getElementById('payment-reference').value = paymentReference;
+          
+          // Open Paystack payment modal
+          if (data.data.authorizationUrl) {
+            // For redirect payment, we'll use inline after
+            payWithPaystack(customer.email, totalAmount, paymentReference, customer.name, customer.phone, customer, deliveryInfo);
+          } else {
+            // Fallback to inline payment
+            payWithPaystack(customer.email, totalAmount, paymentReference, customer.name, customer.phone, customer, deliveryInfo);
+          }
+        } else {
+          throw new Error(data.message || 'Failed to initialize payment');
+        }
+      } catch (error) {
+        console.error('Payment initialization error:', error);
+        btn.disabled = false;
+        btn.innerHTML = 'Complete Order';
+        cart.showNotification('Failed to initialize payment: ' + error.message);
+      }
     }
 
     // Handle receipt upload to Cloudinary (kept for backward compatibility)
