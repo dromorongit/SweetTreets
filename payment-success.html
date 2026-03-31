@@ -183,7 +183,7 @@
       document.getElementById('success-title').style.display = 'block';
       document.getElementById('success-title').textContent = 'Payment Successful!';
       document.getElementById('success-message').textContent = 
-        'Thank you for your order! Your payment has been received and your order is being processed.';
+        'Thank you for your order! Your payment has been received. Redirecting to WhatsApp...';
       
       if (paymentData.metadata) {
         document.getElementById('order-details').style.display = 'block';
@@ -192,6 +192,74 @@
       
       document.getElementById('amount-paid').textContent = `₵${paymentData.amount.toFixed(2)}`;
       document.getElementById('transaction-ref').textContent = paymentData.reference;
+      
+      // Redirect to WhatsApp with order details
+      redirectToWhatsAppAfterPayment(paymentData);
+    }
+    
+    async function redirectToWhatsAppAfterPayment(paymentData) {
+      try {
+        // Get pending order from localStorage
+        const pendingOrderJson = localStorage.getItem('pendingOrder');
+        
+        if (pendingOrderJson) {
+          const pendingOrder = JSON.parse(pendingOrderJson);
+          
+          // Create order object
+          const order = {
+            orderId: pendingOrder.orderId || paymentData.metadata?.orderId || generateOrderId(),
+            items: pendingOrder.items,
+            total: pendingOrder.total
+          };
+          
+          // Get customer info
+          const customer = pendingOrder.customer;
+          
+          // Generate WhatsApp message
+          const itemsList = order.items.map(item => 
+            `• ${item.name} x${item.quantity} - ₵${(item.price * item.quantity).toFixed(2)}`
+          ).join('%0A');
+          
+          const deliveryText = 'To be discussed';
+          
+          const message = `🏪 *Sweet Treets Order*%0A%0A` +
+            `*Order ID:* ${order.orderId}%0A%0A` +
+            `*Customer:* ${customer.name}%0A` +
+            `*Phone:* ${customer.phone}%0A` +
+            `*Delivery Address:* ${customer.address}, ${customer.city}, ${customer.region}%0A%0A` +
+            `*Items Ordered:*%0A${itemsList}%0A%0A` +
+            `*Subtotal:* ₵${order.total.toFixed(2)}%0A` +
+            `*Delivery Fee:* ${deliveryText}%0A` +
+            `*Total Amount:* ₵${order.total.toFixed(2)}%0A%0A` +
+            `*Payment Status:* Paid via Paystack%0A` +
+            `*Transaction Ref:* ${paymentData.reference}`;
+          
+          const whatsappNumber = '233540421116';
+          const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+          
+          // Clear pending order from localStorage
+          localStorage.removeItem('pendingOrder');
+          
+          // Clear cart
+          localStorage.removeItem('sweettreets_cart');
+          
+          // Redirect to WhatsApp after a short delay
+          setTimeout(() => {
+            window.location.href = whatsappUrl;
+          }, 2000);
+        } else {
+          // No pending order found, just show success
+          console.log('No pending order found in localStorage');
+        }
+      } catch (error) {
+        console.error('Error redirecting to WhatsApp:', error);
+      }
+    }
+    
+    function generateOrderId() {
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `ST-${timestamp}-${random}`;
     }
 
     function showPending() {

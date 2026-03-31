@@ -489,9 +489,19 @@
           // Show success notification
           cart.showNotification('Payment successful! Sending order to WhatsApp...');
           
+          // Store order info in localStorage for WhatsApp redirect
+          const orderInfo = {
+            orderId: generateOrderId(),
+            items: cart.getItems(),
+            total: cart.getTotal(),
+            customer: customer,
+            deliveryInfo: deliveryInfo
+          };
+          localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
+          
           // Create order and send to WhatsApp
           const order = {
-            orderId: generateOrderId(),
+            orderId: orderInfo.orderId,
             items: cart.getItems(),
             total: cart.getTotal()
           };
@@ -596,10 +606,19 @@
           // Store payment reference
           document.getElementById('payment-reference').value = paymentReference;
           
-          // Open Paystack payment modal
+          // Store order info in localStorage for WhatsApp redirect after payment
+          const orderInfo = {
+            orderId: data.data.orderId || generateOrderId(),
+            items: cart.getItems(),
+            total: cart.getTotal(),
+            customer: customer,
+            deliveryInfo: deliveryInfo
+          };
+          localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
+          
+          // Redirect to Paystack payment page
           if (data.data.authorizationUrl) {
-            // For redirect payment, we'll use inline after
-            payWithPaystack(customer.email, totalAmount, paymentReference, customer.name, customer.phone, customer, deliveryInfo);
+            window.location.href = data.data.authorizationUrl;
           } else {
             // Fallback to inline payment
             payWithPaystack(customer.email, totalAmount, paymentReference, customer.name, customer.phone, customer, deliveryInfo);
